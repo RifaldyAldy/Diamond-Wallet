@@ -1,30 +1,50 @@
 package controller
 
 import (
+	"net/http"
+
+	"github.com/RifaldyAldy/diamond-wallet/model/dto"
 	"github.com/RifaldyAldy/diamond-wallet/usecase"
 	"github.com/gin-gonic/gin"
 )
 
-type PingController struct {
-	uc usecase.PingUseCase
+type UserController struct {
+	uc usecase.UserUseCase
 	rg *gin.RouterGroup
 }
 
-func (p *PingController) GetHandler(c *gin.Context) {
-	err := p.uc.Ping()
-	if err != nil {
-		c.String(404, err.Error())
+func (e *UserController) createHandler(c *gin.Context) {
+	var payload dto.UserRequestDto
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": err.Error(),
+		})
 		return
 	}
-	c.JSON(200, "PONG! - Database connected")
+
+	payloadResponse, err := e.uc.CreateUser(payload)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "success",
+		"data":    payloadResponse,
+	})
 }
 
-func (p *PingController) Route() {
-	p.rg.GET("/ping", p.GetHandler)
+func (p *UserController) Route() {
+	p.rg.POST("/users", p.createHandler)
 }
 
-func NewPingController(uc usecase.PingUseCase, rg *gin.RouterGroup) *PingController {
-	return &PingController{
+func NewUserController(uc usecase.UserUseCase, rg *gin.RouterGroup) *UserController {
+	return &UserController{
 		uc: uc,
 		rg: rg,
 	}
