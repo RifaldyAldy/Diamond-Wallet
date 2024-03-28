@@ -19,6 +19,8 @@ type Server struct {
 func (s *Server) setupControllers() {
 	rg := s.engine.Group("/api/v1")
 	controller.NewPingController(s.uc.PingUseCase(), rg).Route()
+	controller.NewTransferController(s.uc.TransferUseCase(), rg).Route()
+	controller.NewTopupController(s.uc.TopupUseCase(), rg).Route()
 }
 
 func (s *Server) Run() {
