@@ -5,25 +5,15 @@ import (
 )
 
 type UseCaseManager interface {
-	PingUseCase() usecase.PingUseCase
-	TransferUseCase() usecase.TransferUseCase
-	TopupUseCase() usecase.TopupUseCase
+	UserUseCase() usecase.UserUseCase
 }
 
 type useCaseManager struct {
 	repo RepoManager
 }
 
-func (u *useCaseManager) PingUseCase() usecase.PingUseCase {
-	return usecase.NewPingUseCase(u.repo.PingRepo())
-}
-
-func (u *useCaseManager) TransferUseCase() usecase.TransferUseCase {
-	return usecase.NewTransferUseCase(u.repo.TransferRepo())
-}
-
-func (u *useCaseManager) TopupUseCase() usecase.TopupUseCase {
-	return usecase.NewTopupUseCase(u.repo.TopupRepo())
+func (u *useCaseManager) UserUseCase() usecase.UserUseCase {
+	return usecase.NewUserUseCase(u.repo.UserRepo())
 }
 
 func NewUseCaseManager(repo RepoManager) UseCaseManager {
