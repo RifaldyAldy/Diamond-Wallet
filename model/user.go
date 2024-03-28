@@ -13,3 +13,9 @@ type User struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
+
+type JwtClaims struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+	Role string `json:"role"`
+}
