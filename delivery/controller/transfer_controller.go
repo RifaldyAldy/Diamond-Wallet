@@ -13,7 +13,7 @@ type TransferController struct {
 // tulis handler code kalian disini
 
 func (t *TransferController) Route() {
-	rg := t.rg.Group("/transfer")
+	// rg := t.rg.Group("/transfer")
 	{
 		//tulis route disini
 	}

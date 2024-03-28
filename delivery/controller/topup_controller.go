@@ -13,7 +13,7 @@ type TopupController struct {
 // tulis handler code kalian disini
 
 func (t *TopupController) Route() {
-	rg := t.rg.Group("/topup")
+	// rg := t.rg.Group("/topup")
 	{
 		//tulis route disini
 	}
