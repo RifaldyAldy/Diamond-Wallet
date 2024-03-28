@@ -20,6 +20,7 @@ func (s *Server) setupControllers() {
 	rg := s.engine.Group("/api/v1")
 	controller.NewTransferController(s.uc.TransferUseCase(), rg).Route()
 	controller.NewTopupController(s.uc.TopupUseCase(), rg).Route()
+	controller.NewUserController(s.uc.UserUseCase(), rg).Route()
 }
 
 func (s *Server) Run() {

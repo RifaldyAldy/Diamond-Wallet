@@ -7,6 +7,7 @@ import (
 type RepoManager interface {
 	TransferRepo() repository.TransferRepository
 	TopupRepo() repository.TopupRepository
+	UserRepo() repository.UserRepository
 }
 
 type repoManager struct {
@@ -19,6 +20,9 @@ func (r *repoManager) TransferRepo() repository.TransferRepository {
 
 func (r *repoManager) TopupRepo() repository.TopupRepository {
 	return repository.NewTopUpRepository(r.infra.Conn())
+}
+func (r *repoManager) UserRepo() repository.UserRepository {
+	return repository.NewUserRepository(r.infra.Conn())
 }
 
 func NewRepoManager(infra InfraManager) RepoManager {
