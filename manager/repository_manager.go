@@ -21,6 +21,7 @@ func (r *repoManager) TransferRepo() repository.TransferRepository {
 func (r *repoManager) TopupRepo() repository.TopupRepository {
 	return repository.NewTopUpRepository(r.infra.Conn())
 }
+
 func (r *repoManager) UserRepo() repository.UserRepository {
 	return repository.NewUserRepository(r.infra.Conn())
 }

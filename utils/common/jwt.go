@@ -26,7 +26,7 @@ func GenerateTokenJwt(UserData model.User, expiredAt int64) (string, error) {
 	claims := JwtClaim{
 		StandardClaims: jwt.StandardClaims{
 			Issuer:    appName,
-			ExpiresAt: expiredAt, //expayet waktu login
+			ExpiresAt: expiredAt, // expayet waktu login
 		},
 
 		UserData: model.User{
@@ -48,12 +48,12 @@ func GenerateTokenJwt(UserData model.User, expiredAt int64) (string, error) {
 	return signedToken, nil
 }
 
-// JWTAuth - auth jwt
 func JWTAuth(roles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if !strings.Contains(authHeader, "Bearer") {
 			SendErrorResponse(c, http.StatusForbidden, "Invalid Token")
+
 			return
 		}
 
@@ -63,7 +63,6 @@ func JWTAuth(roles ...string) gin.HandlerFunc {
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 			return jwtSignatureKey, nil
 		})
-
 		if err != nil {
 			SendErrorResponse(c, http.StatusInternalServerError, err.Error())
 			return
@@ -71,6 +70,7 @@ func JWTAuth(roles ...string) gin.HandlerFunc {
 
 		if !token.Valid {
 			SendErrorResponse(c, http.StatusUnauthorized, "Unaunthorized user")
+
 			return
 		}
 
@@ -80,7 +80,8 @@ func JWTAuth(roles ...string) gin.HandlerFunc {
 			return
 		}
 
-		//validation role
+		// validation role
+
 		validRole := false
 		if len(roles) > 0 {
 			for _, role := range roles {
@@ -94,6 +95,7 @@ func JWTAuth(roles ...string) gin.HandlerFunc {
 			SendErrorResponse(c, http.StatusForbidden, "You dont have permission")
 			return
 		}
+
 		c.Next()
 	}
 }

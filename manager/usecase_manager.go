@@ -21,6 +21,7 @@ func (u *useCaseManager) TransferUseCase() usecase.TransferUseCase {
 func (u *useCaseManager) TopupUseCase() usecase.TopupUseCase {
 	return usecase.NewTopupUseCase(u.repo.TopupRepo())
 }
+
 func (u *useCaseManager) UserUseCase() usecase.UserUseCase {
 	return usecase.NewUserUseCase(u.repo.UserRepo())
 }

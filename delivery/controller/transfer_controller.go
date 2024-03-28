@@ -15,7 +15,7 @@ type TransferController struct {
 func (t *TransferController) Route() {
 	// rg := t.rg.Group("/transfer")
 	{
-		//tulis route disini
+		// tulis route disini
 	}
 }
 
