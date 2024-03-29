@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/RifaldyAldy/diamond-wallet/model"
 	"github.com/RifaldyAldy/diamond-wallet/model/dto"
@@ -40,11 +41,27 @@ func (t *TopupController) CreateTopupHandler(c *gin.Context) {
 	common.SendCreateResponse(c, "SUCCESS", res)
 }
 
+func (t *TopupController) ResponseTopupHandler(c *gin.Context) {
+	var payload dto.ResponsePayment
+	payload.OrderId = c.Query("order_id")
+	payload.StatusCode, _ = strconv.Atoi(c.Query("status_code"))
+	payload.TransactionStatus = c.Query("transaction_status")
+
+	res, err := t.ut.PaymentUpdate(payload)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(c, "SUCCESS", res)
+}
+
 func (t *TopupController) Route() {
 	rg := t.rg.Group("/topup")
 	{
 		//tulis route disini
 		rg.POST("/", common.JWTAuth("user"), t.CreateTopupHandler)
+		rg.GET("/response", t.ResponseTopupHandler)
 	}
 }
 
