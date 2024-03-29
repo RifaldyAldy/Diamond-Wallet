@@ -91,6 +91,8 @@ func JWTAuth(roles ...string) gin.HandlerFunc {
 			return
 		}
 
+		c.Set("claims", claims)
+
 		c.Next()
 	}
 }

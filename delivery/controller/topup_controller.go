@@ -1,24 +1,53 @@
 package controller
 
 import (
+	"fmt"
+	"net/http"
+
+	"github.com/RifaldyAldy/diamond-wallet/model"
+	"github.com/RifaldyAldy/diamond-wallet/model/dto"
 	"github.com/RifaldyAldy/diamond-wallet/usecase"
+	"github.com/RifaldyAldy/diamond-wallet/utils/common"
 	"github.com/gin-gonic/gin"
 )
 
 type TopupController struct {
-	uc usecase.TopupUseCase
+	ut usecase.TopupUseCase
+	uc usecase.UserUseCase
 	rg *gin.RouterGroup
 }
 
 // tulis handler code kalian disini
+func (t *TopupController) CreateTopupHandler(c *gin.Context) {
+	var payload model.TopupModel
+	var ammount dto.TopupRequest
+	c.ShouldBind(&ammount)
+	payload.TransactionDetails.GrossAmt = int64(ammount.Ammount)
+	claims, exists := c.Get("claims")
+	if !exists {
+		common.SendErrorResponse(c, http.StatusBadRequest, "Sepertinya login anda tidak valid")
+		return
+	}
+	payload.User.Id = claims.(*common.JwtClaim).DataClaims.Id
+	fmt.Println(payload.User.Id)
+	payload.User, _ = t.uc.FindById(payload.User.Id)
+	res, err := t.ut.CreateTopup(payload)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	common.SendCreateResponse(c, "SUCCESS", res)
+}
 
 func (t *TopupController) Route() {
-	// rg := t.rg.Group("/topup")
+	rg := t.rg.Group("/topup")
 	{
 		//tulis route disini
+		rg.POST("/", common.JWTAuth("user"), t.CreateTopupHandler)
 	}
 }
 
-func NewTopupController(uc usecase.TopupUseCase, rg *gin.RouterGroup) *TopupController {
-	return &TopupController{uc: uc, rg: rg}
+func NewTopupController(ut usecase.TopupUseCase, uc usecase.UserUseCase, rg *gin.RouterGroup) *TopupController {
+	return &TopupController{ut: ut, uc: uc, rg: rg}
 }
