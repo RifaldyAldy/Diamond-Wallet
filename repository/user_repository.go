@@ -8,12 +8,39 @@ import (
 )
 
 type UserRepository interface {
+	Get(id string) (model.User, error)
 	Create(payload model.User) (model.User, error)
 	GetByUsername(username string) (model.User, error)
 }
 
 type userRepository struct {
 	db *sql.DB
+}
+
+func (u *userRepository) Get(id string) (model.User, error) {
+	var user model.User
+	err := u.db.QueryRow(`
+	SELECT 
+	  id, name, username, role, email, phone_number, created_at, updated_at
+	FROM
+	  mst_user 
+	WHERE
+	  id = $1
+	  `, id).Scan(&user.Id,
+		&user.Name,
+		&user.Username,
+		&user.Role,
+		&user.Email,
+		&user.PhoneNumber,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err != nil {
+		return model.User{}, err
+	}
+
+	return user, nil
 }
 
 func (u *userRepository) Create(payload model.User) (model.User, error) {

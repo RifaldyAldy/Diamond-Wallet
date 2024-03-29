@@ -14,6 +14,19 @@ type UserController struct {
 	rg *gin.RouterGroup
 }
 
+func (e *UserController) getHandler(c *gin.Context) {
+	id := c.Param("id")
+
+	response, err := e.uc.FindById(id)
+
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, "Error "+err.Error())
+		return
+	}
+
+	common.SendSingleResponse(c, "OK", response)
+}
+
 func (e *UserController) createHandler(c *gin.Context) {
 	var payload dto.UserRequestDto
 	if err := c.ShouldBindJSON(&payload); err != nil {
@@ -61,6 +74,7 @@ func (u *UserController) loginHandler(c *gin.Context) {
 func (p *UserController) Route() {
 	p.rg.POST("/users/login", p.loginHandler)
 	p.rg.POST("/users", p.createHandler)
+	p.rg.GET("/users/:id", p.getHandler)
 }
 
 func NewUserController(uc usecase.UserUseCase, rg *gin.RouterGroup) *UserController {
