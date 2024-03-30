@@ -71,10 +71,27 @@ func (u *UserController) loginHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "success", loginData)
 }
 
+func (u *UserController) CheckBalance(c *gin.Context) {
+	claims, exists := c.Get("claims")
+	if !exists {
+		common.SendErrorResponse(c, http.StatusInternalServerError, "Claims jwt tidak ada!")
+		return
+	}
+	id := claims.(*common.JwtClaim).DataClaims.Id
+	response, err := u.uc.GetBalanceCase(id)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(c, "SUCCESS", response)
+}
+
 func (p *UserController) Route() {
 	p.rg.POST("/users/login", p.loginHandler)
 	p.rg.POST("/users", p.createHandler)
 	p.rg.GET("/users/:id", p.getHandler)
+	p.rg.GET("/users/saldo", common.JWTAuth("user"), p.CheckBalance)
 }
 
 func NewUserController(uc usecase.UserUseCase, rg *gin.RouterGroup) *UserController {

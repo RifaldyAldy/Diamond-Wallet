@@ -28,3 +28,8 @@ type JwtClaims struct {
 	Name string `json:"name"`
 	Role string `json:"role"`
 }
+
+type UserSaldo struct {
+	User  UserResponse `json:"user"`
+	Saldo int          `json:"saldo"`
+}

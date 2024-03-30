@@ -10,6 +10,7 @@ import (
 type UserRepository interface {
 	Get(id string) (model.User, error)
 	Create(payload model.User) (model.User, error)
+	GetBalance(user_id string) (model.UserSaldo, error)
 	GetByUsername(username string) (model.User, error)
 }
 
@@ -102,6 +103,38 @@ func (u *userRepository) GetByUsername(username string) (model.User, error) {
 		return model.User{}, err
 	}
 	return user, nil
+}
+
+func (u *userRepository) GetBalance(user_id string) (model.UserSaldo, error) {
+	var response model.UserSaldo
+
+	err := u.db.QueryRow(`SELECT 
+		u.name,
+		u.role,
+		u.email,
+		u.phone_number,
+		u.created_at,
+		u.updated_at,
+		s.saldo
+	FROM 
+   		 mst_user AS u
+	LEFT JOIN 
+    	mst_saldo AS s ON u.id = s.user_id
+	WHERE 
+		u.id = $1;`, user_id).Scan(
+		&response.User.Name,
+		&response.User.Role,
+		&response.User.Email,
+		&response.User.PhoneNumber,
+		&response.User.CreatedAt,
+		&response.User.UpdatedAt,
+		&response.Saldo,
+	)
+	if err != nil {
+		return model.UserSaldo{}, err
+	}
+
+	return response, nil
 }
 
 func NewUserRepository(db *sql.DB) UserRepository {
