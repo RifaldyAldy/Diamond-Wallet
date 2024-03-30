@@ -6,8 +6,8 @@ import (
 
 	"github.com/RifaldyAldy/diamond-wallet/config"
 	"github.com/RifaldyAldy/diamond-wallet/delivery/controller"
+	"github.com/RifaldyAldy/diamond-wallet/delivery/middleware"
 	"github.com/RifaldyAldy/diamond-wallet/manager"
-	"github.com/RifaldyAldy/diamond-wallet/middleware"
 	"github.com/gin-gonic/gin"
 )
 
