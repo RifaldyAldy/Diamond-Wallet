@@ -18,7 +18,6 @@ func (e *UserController) getHandler(c *gin.Context) {
 	id := c.Param("id")
 
 	response, err := e.uc.FindById(id)
-
 	if err != nil {
 		common.SendErrorResponse(c, http.StatusInternalServerError, "Error "+err.Error())
 		return
@@ -87,11 +86,29 @@ func (u *UserController) CheckBalance(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", response)
 }
 
+func (u *UserController) VerifyHandler(c *gin.Context) {
+	var payload dto.VerifyUser
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": err.Error(),
+		})
+		return
+	}
+	response, err := u.uc.VerifyUser(payload)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	common.SendCreateResponse(c, "success", response)
+}
+
 func (p *UserController) Route() {
 	p.rg.POST("/users/login", p.loginHandler)
 	p.rg.POST("/users", p.createHandler)
 	p.rg.GET("/users/:id", p.getHandler)
 	p.rg.GET("/users/saldo", common.JWTAuth("user"), p.CheckBalance)
+	p.rg.POST("/users/verify", p.VerifyHandler)
 }
 
 func NewUserController(uc usecase.UserUseCase, rg *gin.RouterGroup) *UserController {
