@@ -11,7 +11,7 @@ import (
 
 func LogMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		file, err := os.OpenFile("Logger log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		file, err := os.OpenFile("log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			log.Fatal("err", err.Error())
 		}
