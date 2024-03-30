@@ -7,6 +7,7 @@ import (
 	"github.com/RifaldyAldy/diamond-wallet/config"
 	"github.com/RifaldyAldy/diamond-wallet/delivery/controller"
 	"github.com/RifaldyAldy/diamond-wallet/manager"
+	"github.com/RifaldyAldy/diamond-wallet/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,6 +19,7 @@ type Server struct {
 
 func (s *Server) setupControllers() {
 	rg := s.engine.Group("/api/v1")
+	rg.Use(middleware.LogMiddleware())
 	controller.NewTransferController(s.uc.TransferUseCase(), rg).Route()
 	controller.NewTopupController(s.uc.TopupUseCase(), s.uc.UserUseCase(), rg).Route()
 	controller.NewUserController(s.uc.UserUseCase(), rg).Route()
