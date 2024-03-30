@@ -44,9 +44,10 @@ CREATE TABLE mst_admin(
 CREATE TABLE trx_transfer(
  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
  user_id UUID NOT NULL,
- tujuan_transfer UUID NOT NULL,
+ id_tujuan_transfer UUID NOT NULL,
  jumlah_transfer BIGINT NOT NULL,
  jenis_transfer VARCHAR(100) NOT NULL,
+ transfer_at VARCHAR(100) NOT NULL,
  FOREIGN KEY(tujuan_transfer) REFERENCES mst_user(id),
  FOREIGN KEY(user_id) REFERENCES mst_user(id)
 );

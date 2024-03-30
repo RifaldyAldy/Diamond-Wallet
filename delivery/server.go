@@ -21,6 +21,7 @@ func (s *Server) setupControllers() {
 	controller.NewTransferController(s.uc.TransferUseCase(), rg).Route()
 	controller.NewTopupController(s.uc.TopupUseCase(), s.uc.UserUseCase(), rg).Route()
 	controller.NewUserController(s.uc.UserUseCase(), rg).Route()
+	controller.NewAdminController(s.uc.AdminUseCase(), s.uc.UserUseCase(), rg).Route()
 }
 
 func (s *Server) Run() {

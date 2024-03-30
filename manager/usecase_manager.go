@@ -8,6 +8,7 @@ type UseCaseManager interface {
 	TransferUseCase() usecase.TransferUseCase
 	TopupUseCase() usecase.TopupUseCase
 	UserUseCase() usecase.UserUseCase
+	AdminUseCase() usecase.AdminUseCase
 }
 
 type useCaseManager struct {
@@ -24,6 +25,10 @@ func (u *useCaseManager) TopupUseCase() usecase.TopupUseCase {
 
 func (u *useCaseManager) UserUseCase() usecase.UserUseCase {
 	return usecase.NewUserUseCase(u.repo.UserRepo())
+}
+
+func (u *useCaseManager) AdminUseCase() usecase.AdminUseCase {
+	return usecase.NewAdminUseCase(u.repo.AdminRepo())
 }
 
 func NewUseCaseManager(repo RepoManager) UseCaseManager {

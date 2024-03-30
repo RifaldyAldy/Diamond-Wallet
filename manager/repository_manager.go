@@ -8,6 +8,7 @@ type RepoManager interface {
 	TransferRepo() repository.TransferRepository
 	TopupRepo() repository.TopupRepository
 	UserRepo() repository.UserRepository
+	AdminRepo() repository.AdminRepository
 }
 
 type repoManager struct {
@@ -24,6 +25,10 @@ func (r *repoManager) TopupRepo() repository.TopupRepository {
 
 func (r *repoManager) UserRepo() repository.UserRepository {
 	return repository.NewUserRepository(r.infra.Conn())
+}
+
+func (r *repoManager) AdminRepo() repository.AdminRepository {
+	return repository.NewAdminRepository(r.infra.Conn())
 }
 
 func NewRepoManager(infra InfraManager) RepoManager {
