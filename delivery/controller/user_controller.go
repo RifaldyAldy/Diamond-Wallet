@@ -18,7 +18,6 @@ func (e *UserController) getHandler(c *gin.Context) {
 	id := c.Param("id")
 
 	response, err := e.uc.FindById(id)
-
 	if err != nil {
 		common.SendErrorResponse(c, http.StatusInternalServerError, "Error "+err.Error())
 		return
@@ -87,11 +86,34 @@ func (u *UserController) CheckBalance(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", response)
 }
 
+func (u *UserController) VerifyHandler(c *gin.Context) {
+	var payload dto.VerifyUser
+	claims, exists := c.Get("claims")
+	if !exists {
+		common.SendErrorResponse(c, http.StatusInternalServerError, "Claims jwt tidak ada!")
+		return
+	}
+	payload, err := common.FileVerifyHandler(c)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, "failed upload photo"+err.Error())
+		return
+	}
+	payload.UserId = claims.(*common.JwtClaim).DataClaims.Id
+
+	response, err := u.uc.VerifyUser(payload)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	common.SendCreateResponse(c, "success", response)
+}
+
 func (p *UserController) Route() {
 	p.rg.POST("/users/login", p.loginHandler)
 	p.rg.POST("/users", p.createHandler)
 	p.rg.GET("/users/:id", p.getHandler)
 	p.rg.GET("/users/saldo", common.JWTAuth("user"), p.CheckBalance)
+	p.rg.POST("/users/verify", common.JWTAuth("user"), p.VerifyHandler)
 }
 
 func NewUserController(uc usecase.UserUseCase, rg *gin.RouterGroup) *UserController {

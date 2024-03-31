@@ -17,6 +17,7 @@ type UserUseCase interface {
 	LoginUser(in dto.LoginRequestDto) (dto.LoginResponseDto, error)
 	FindById(id string) (model.User, error)
 	GetBalanceCase(id string) (model.UserSaldo, error)
+	VerifyUser(payload dto.VerifyUser) (dto.VerifyUser, error)
 }
 
 type userUseCase struct {
@@ -82,6 +83,14 @@ func (u *userUseCase) GetBalanceCase(id string) (model.UserSaldo, error) {
 		return model.UserSaldo{}, err
 	}
 
+	return response, nil
+}
+
+func (u *userUseCase) VerifyUser(payload dto.VerifyUser) (dto.VerifyUser, error) {
+	response, err := u.repo.Verify(payload)
+	if err != nil {
+		return dto.VerifyUser{}, err
+	}
 	return response, nil
 }
 
