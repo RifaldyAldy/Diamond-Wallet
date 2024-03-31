@@ -95,6 +95,12 @@ func (u *UserController) VerifyHandler(c *gin.Context) {
 		})
 		return
 	}
+	claims, exists := c.Get("claims")
+	if !exists {
+		common.SendErrorResponse(c, http.StatusInternalServerError, "Claims jwt tidak ada!")
+		return
+	}
+	payload.UserId = claims.(*common.JwtClaim).DataClaims.Id
 	response, err := u.uc.VerifyUser(payload)
 	if err != nil {
 		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -108,7 +114,7 @@ func (p *UserController) Route() {
 	p.rg.POST("/users", p.createHandler)
 	p.rg.GET("/users/:id", p.getHandler)
 	p.rg.GET("/users/saldo", common.JWTAuth("user"), p.CheckBalance)
-	p.rg.POST("/users/verify", p.VerifyHandler)
+	p.rg.POST("/users/verify", common.JWTAuth("user"), p.VerifyHandler)
 }
 
 func NewUserController(uc usecase.UserUseCase, rg *gin.RouterGroup) *UserController {
