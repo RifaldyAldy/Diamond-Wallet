@@ -67,7 +67,7 @@ func (u *userUseCase) LoginUser(in dto.LoginRequestDto) (dto.LoginResponseDto, e
 	loginExpDuration := time.Duration(10) * time.Minute
 	expiredAt := time.Now().Add(loginExpDuration).Unix()
 	// TODO: tempel generate token jwt
-	accessToken, err := common.GenerateTokenJwt(userData, expiredAt)
+	accessToken, err := common.GenerateTokenJwt(userData.Id, userData.Name, userData.Role, expiredAt)
 	if err != nil {
 		return dto.LoginResponseDto{}, err
 	}
