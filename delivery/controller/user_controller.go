@@ -100,7 +100,14 @@ func (u *UserController) VerifyHandler(c *gin.Context) {
 		common.SendErrorResponse(c, http.StatusInternalServerError, "Claims jwt tidak ada!")
 		return
 	}
+	photo, err := common.FileVerifyHandler(c)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, "failed upload photo"+err.Error())
+		return
+	}
+	payload.Photo = photo.Photo
 	payload.UserId = claims.(*common.JwtClaim).DataClaims.Id
+
 	response, err := u.uc.VerifyUser(payload)
 	if err != nil {
 		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
