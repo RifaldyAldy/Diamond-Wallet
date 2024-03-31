@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/RifaldyAldy/diamond-wallet/model"
+	"github.com/RifaldyAldy/diamond-wallet/model/dto"
 	"github.com/RifaldyAldy/diamond-wallet/usecase"
 	"github.com/RifaldyAldy/diamond-wallet/utils/common"
 	"github.com/RifaldyAldy/diamond-wallet/utils/encryption"
@@ -29,10 +30,24 @@ func (a *AdminController) RegisterHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", res)
 }
 
+func (a *AdminController) LoginHandler(c *gin.Context) {
+	payload := dto.LoginRequestDto{}
+	c.ShouldBind(&payload)
+
+	response, err := a.ua.LoginAdmin(payload)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(c, "SUCCESS", response)
+}
+
 func (a *AdminController) Route() {
 	rg := a.rg.Group("/admin")
 	{
 		rg.POST("/", a.RegisterHandler)
+		rg.POST("/login", a.LoginHandler)
 	}
 }
 

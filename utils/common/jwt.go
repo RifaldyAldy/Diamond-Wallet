@@ -22,16 +22,16 @@ var (
 	jwtSignatureKey  = []byte(os.Getenv("TOKEN_KEY"))
 )
 
-func GenerateTokenJwt(UserData model.User, expiredAt int64) (string, error) {
+func GenerateTokenJwt(id, name, role string, expiredAt int64) (string, error) {
 	claims := JwtClaim{
 		StandardClaims: jwt.StandardClaims{
 			Issuer:    appName,
 			ExpiresAt: expiredAt, // expayet waktu login
 		},
 		DataClaims: model.JwtClaims{
-			Id:   UserData.Id,
-			Name: UserData.Name,
-			Role: UserData.Role,
+			Id:   id,
+			Name: name,
+			Role: role,
 		},
 	}
 
