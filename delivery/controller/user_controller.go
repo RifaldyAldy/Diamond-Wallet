@@ -88,24 +88,16 @@ func (u *UserController) CheckBalance(c *gin.Context) {
 
 func (u *UserController) VerifyHandler(c *gin.Context) {
 	var payload dto.VerifyUser
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code":    http.StatusBadRequest,
-			"message": err.Error(),
-		})
-		return
-	}
 	claims, exists := c.Get("claims")
 	if !exists {
 		common.SendErrorResponse(c, http.StatusInternalServerError, "Claims jwt tidak ada!")
 		return
 	}
-	photo, err := common.FileVerifyHandler(c)
+	payload, err := common.FileVerifyHandler(c)
 	if err != nil {
 		common.SendErrorResponse(c, http.StatusInternalServerError, "failed upload photo"+err.Error())
 		return
 	}
-	payload.Photo = photo.Photo
 	payload.UserId = claims.(*common.JwtClaim).DataClaims.Id
 
 	response, err := u.uc.VerifyUser(payload)
