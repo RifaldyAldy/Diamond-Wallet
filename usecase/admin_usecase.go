@@ -34,7 +34,7 @@ func (a *adminUseCase) LoginAdmin(payload dto.LoginRequestDto) (dto.LoginRespons
 	if err != nil {
 		return dto.LoginResponseDto{}, err
 	}
-	isValid := encryption.CheckPasswordHash(response.Password, payload.Pass)
+	isValid := encryption.CheckPasswordHash(payload.Pass, response.Password)
 	if !isValid {
 		return dto.LoginResponseDto{}, errors.New("password salah")
 	}
