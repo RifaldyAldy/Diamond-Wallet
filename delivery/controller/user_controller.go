@@ -87,11 +87,38 @@ func (u *UserController) CheckBalance(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", response)
 }
 
+func (s *UserController) UpdateHandler(c *gin.Context) {
+	id := c.Param("id")
+	var payload dto.UserRequestDto
+	if err := c.BindJSON(&payload); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "Invalid Request Payload",
+		})
+		return
+	}
+
+	updatedUser, err := s.uc.UpdateUser(id, payload)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "Update User Succesful",
+		"data":    updatedUser,
+	})
+}
+
 func (p *UserController) Route() {
 	p.rg.POST("/users/login", p.loginHandler)
 	p.rg.POST("/users", p.createHandler)
 	p.rg.GET("/users/:id", p.getHandler)
 	p.rg.GET("/users/saldo", common.JWTAuth("user"), p.CheckBalance)
+	p.rg.PUT("/users/:id", p.UpdateHandler)
 }
 
 func NewUserController(uc usecase.UserUseCase, rg *gin.RouterGroup) *UserController {

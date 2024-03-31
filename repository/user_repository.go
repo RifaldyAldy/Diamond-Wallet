@@ -12,6 +12,7 @@ type UserRepository interface {
 	Create(payload model.User) (model.User, error)
 	GetBalance(user_id string) (model.UserSaldo, error)
 	GetByUsername(username string) (model.User, error)
+	Update(id string, payload model.User) (model.User, error)
 }
 
 type userRepository struct {
@@ -135,6 +136,41 @@ func (u *userRepository) GetBalance(user_id string) (model.UserSaldo, error) {
 	}
 
 	return response, nil
+}
+
+func (u *userRepository) Update(id string, payload model.User) (model.User, error) {
+	var user model.User
+	err := u.db.QueryRow(`
+  UPDATE mst_user SET
+    name = $1, username = $2, password=$3, role=$4, email=$5, phone_number=$6, created_at=$7, updated_at=$8 
+	WHERE id=$9
+    RETURNING id, name, username, password, role, email, phone_number, created_at, updated_at
+		
+    `,
+		payload.Name,
+		payload.Username,
+		payload.Password,
+		payload.Role,
+		payload.Email,
+		payload.PhoneNumber,
+		time.Now(),
+		time.Now(),
+		id,
+	).Scan(
+		&user.Id,
+		&user.Name,
+		&user.Username,
+		&user.Password,
+		&user.Role,
+		&user.Email,
+		&user.PhoneNumber,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+	if err != nil {
+		return model.User{}, err
+	}
+	return user, nil
 }
 
 func NewUserRepository(db *sql.DB) UserRepository {

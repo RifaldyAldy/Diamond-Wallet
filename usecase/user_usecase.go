@@ -17,6 +17,7 @@ type UserUseCase interface {
 	LoginUser(in dto.LoginRequestDto) (dto.LoginResponseDto, error)
 	FindById(id string) (model.User, error)
 	GetBalanceCase(id string) (model.UserSaldo, error)
+	UpdateUser(id string, payload dto.UserRequestDto) (model.User, error)
 }
 
 type userUseCase struct {
@@ -83,6 +84,28 @@ func (u *userUseCase) GetBalanceCase(id string) (model.UserSaldo, error) {
 	}
 
 	return response, nil
+}
+
+func (u *userUseCase) UpdateUser(id string, payload dto.UserRequestDto) (model.User, error) {
+	hashPassword, err := encryption.HashPassword(payload.Password)
+	if err != nil {
+		return model.User{}, err
+	}
+
+	updatedUser := model.User{
+		Id:          id,
+		Name:        payload.Name,
+		Username:    payload.Username,
+		Password:    hashPassword,
+		Role:        payload.Role,
+		Email:       payload.Email,
+		PhoneNumber: payload.PhoneNumber,
+	}
+	user, err := u.repo.Update(id, updatedUser)
+	if err != nil {
+		return model.User{}, fmt.Errorf("failed to update user : %v", err.Error())
+	}
+	return user, nil
 }
 
 func NewUserUseCase(repo repository.UserRepository) UserUseCase {

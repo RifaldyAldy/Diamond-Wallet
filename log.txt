@@ -1,1 +1,7 @@
 [LOG] ::1 - [2024-03-30 13:21:18.8805116 +0700 +07 m=+50.135208401] level=eror "GET /api/v1/users/891750d7-e824-4a58-9da5-fe469580d818 500 119.3423ms "PostmanRuntime/7.37.0"
+[LOG] ::1 - [2024-03-31 11:05:12.6999414 +0700 +07 m=+87.979361901] level=eror "PUT /api/v1/users/c17716e6-c148-4e54-867a-f90bbb9bcae0 500 363.0604ms "PostmanRuntime/7.37.0"
+[LOG] ::1 - [2024-03-31 11:11:56.1250107 +0700 +07 m=+19.477792701] level=eror "GET /api/v1/users/c17716e6-c148-4e54-867a-f90bbb9bcae0 500 110.3465ms "PostmanRuntime/7.37.0"
+[LOG] ::1 - [2024-03-31 11:22:30.3207981 +0700 +07 m=+653.673580101] level=eror "PUT /api/v1/users/c17716e6-c148-4e54-867a-f90bbb9bcae0 500 322.8249ms "PostmanRuntime/7.37.0"
+[LOG] ::1 - [2024-03-31 11:24:36.2621549 +0700 +07 m=+3.893645901] level=eror "PUT /api/v1/users/c17716e6-c148-4e54-867a-f90bbb9bcae0 500 219.3023ms "PostmanRuntime/7.37.0"
+[LOG] ::1 - [2024-03-31 11:26:34.911841 +0700 +07 m=+22.736100701] level=info "PUT /api/v1/users/c17716e6-c148-4e54-867a-f90bbb9bcae0 200 276.9627ms "PostmanRuntime/7.37.0"
+[LOG] ::1 - [2024-03-31 11:32:05.1289755 +0700 +07 m=+352.953235201] level=info "GET /api/v1/users/c17716e6-c148-4e54-867a-f90bbb9bcae0 200 1.1038ms "PostmanRuntime/7.37.0"
