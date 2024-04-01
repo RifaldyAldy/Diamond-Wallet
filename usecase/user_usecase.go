@@ -17,7 +17,11 @@ type UserUseCase interface {
 	LoginUser(in dto.LoginRequestDto) (dto.LoginResponseDto, error)
 	FindById(id string) (model.User, error)
 	GetBalanceCase(id string) (model.UserSaldo, error)
+<<<<<<< HEAD
 	UpdateUser(id string, payload dto.UserRequestDto) (model.User, error)
+=======
+	VerifyUser(payload dto.VerifyUser) (dto.VerifyUser, error)
+>>>>>>> 24410270d6dfce269bde36ee628e3811967ed3a1
 }
 
 type userUseCase struct {
@@ -106,6 +110,15 @@ func (u *userUseCase) UpdateUser(id string, payload dto.UserRequestDto) (model.U
 		return model.User{}, fmt.Errorf("failed to update user : %v", err.Error())
 	}
 	return user, nil
+
+}
+
+func (u *userUseCase) VerifyUser(payload dto.VerifyUser) (dto.VerifyUser, error) {
+	response, err := u.repo.Verify(payload)
+	if err != nil {
+		return dto.VerifyUser{}, err
+	}
+	return response, nil
 }
 
 func NewUserUseCase(repo repository.UserRepository) UserUseCase {

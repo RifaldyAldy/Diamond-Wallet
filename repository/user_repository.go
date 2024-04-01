@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/RifaldyAldy/diamond-wallet/model"
+	"github.com/RifaldyAldy/diamond-wallet/model/dto"
 )
 
 type UserRepository interface {
@@ -12,7 +13,11 @@ type UserRepository interface {
 	Create(payload model.User) (model.User, error)
 	GetBalance(user_id string) (model.UserSaldo, error)
 	GetByUsername(username string) (model.User, error)
+<<<<<<< HEAD
 	Update(id string, payload model.User) (model.User, error)
+=======
+	Verify(payload dto.VerifyUser) (dto.VerifyUser, error)
+>>>>>>> 24410270d6dfce269bde36ee628e3811967ed3a1
 }
 
 type userRepository struct {
@@ -37,7 +42,6 @@ func (u *userRepository) Get(id string) (model.User, error) {
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
-
 	if err != nil {
 		return model.User{}, err
 	}
@@ -171,6 +175,48 @@ func (u *userRepository) Update(id string, payload model.User) (model.User, erro
 		return model.User{}, err
 	}
 	return user, nil
+
+}
+
+func (u *userRepository) Verify(payload dto.VerifyUser) (dto.VerifyUser, error) {
+	tx, err := u.db.Begin()
+	if err != nil {
+		return dto.VerifyUser{}, err
+	}
+
+	userId, err := u.Get(payload.UserId)
+	if err != nil {
+		tx.Rollback()
+		return dto.VerifyUser{}, err
+	}
+
+	_, err = tx.Exec(`
+        INSERT INTO mst_user_datas
+            (user_id, nik, jenis_kelamin, tanggal_lahir, umur, photo)
+        VALUES
+            ($1, $2, $3, $4, $5, $6)
+    `, userId.Id, payload.Nik, payload.JenisKelamin, payload.TanggalLahir, payload.Umur, payload.Photo)
+	if err != nil {
+		tx.Rollback()
+		return dto.VerifyUser{}, err
+	}
+
+	_, err = tx.Exec(`
+        INSERT INTO mst_saldo
+            (user_id, saldo, pin)
+        VALUES
+            ($1, $2, $3)
+    `, userId.Id, 0, payload.Pin)
+	if err != nil {
+		tx.Rollback()
+		return dto.VerifyUser{}, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return dto.VerifyUser{}, err
+	}
+
+	return payload, nil
 }
 
 func NewUserRepository(db *sql.DB) UserRepository {
