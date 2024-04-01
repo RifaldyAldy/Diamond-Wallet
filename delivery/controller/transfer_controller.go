@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/RifaldyAldy/diamond-wallet/model/dto"
 	"github.com/RifaldyAldy/diamond-wallet/usecase"
@@ -58,11 +59,62 @@ func (t *TransferController) TransferHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", response)
 }
 
+func (t *TransferController) GetSendTransferHandler(c *gin.Context) {
+	var id string
+	var page int
+	page, _ = strconv.Atoi(c.Query("page"))
+
+	if page == 0 {
+		page = 1
+	}
+	claims, exists := c.Get("claims")
+	if !exists {
+		common.SendErrorResponse(c, http.StatusBadRequest, "Sepertinya login anda tidak valid")
+		return
+	}
+	id = claims.(*common.JwtClaim).DataClaims.Id
+
+	datas, err := t.ut.GetSend(id, page)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	common.SendSingleResponse(c, "SUCCESS", datas)
+}
+
+func (t *TransferController) GetReceiveTransferHandler(c *gin.Context) {
+	var id string
+	var page int
+	page, _ = strconv.Atoi(c.Query("page"))
+
+	if page == 0 {
+		page = 1
+	}
+	claims, exists := c.Get("claims")
+	if !exists {
+		common.SendErrorResponse(c, http.StatusBadRequest, "Sepertinya login anda tidak valid")
+		return
+	}
+	id = claims.(*common.JwtClaim).DataClaims.Id
+
+	datas, err := t.ut.GetReceive(id, page)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	common.SendSingleResponse(c, "SUCCESS", datas)
+}
+
 func (t *TransferController) Route() {
 	rg := t.rg.Group("/transfer")
 	{
 		// tulis route disini
 		rg.POST("/", common.JWTAuth("user"), t.TransferHandler)
+		rh := rg.Group("/history")
+		{
+			rh.GET("/send", common.JWTAuth("user"), t.GetSendTransferHandler)
+			rh.GET("/receive", common.JWTAuth("user"), t.GetReceiveTransferHandler)
+		}
 	}
 }
 

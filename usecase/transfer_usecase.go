@@ -8,11 +8,12 @@ import (
 
 type TransferUseCase interface {
 	TransferRequest(payload dto.TransferRequest, send, receive model.User) (model.Transfer, error)
+	GetSend(id string, page int) ([]model.Transfer, error)
+	GetReceive(id string, page int) ([]model.Transfer, error)
 }
 
 type transferUseCase struct {
-	repo   repository.TransferRepository
-	userUC userUseCase
+	repo repository.TransferRepository
 }
 
 // tulis code kalian disini
@@ -24,6 +25,24 @@ func (t *transferUseCase) TransferRequest(payload dto.TransferRequest, send, rec
 	}
 
 	return response, nil
+}
+
+func (t *transferUseCase) GetSend(id string, page int) ([]model.Transfer, error) {
+	datas, err := t.repo.GetSend(id, page)
+	if err != nil {
+		return []model.Transfer{}, err
+	}
+
+	return datas, nil
+}
+
+func (t *transferUseCase) GetReceive(id string, page int) ([]model.Transfer, error) {
+	datas, err := t.repo.GetReceive(id, page)
+	if err != nil {
+		return []model.Transfer{}, err
+	}
+
+	return datas, nil
 }
 
 func NewTransferUseCase(repo repository.TransferRepository) TransferUseCase {

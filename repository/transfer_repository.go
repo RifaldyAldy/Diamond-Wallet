@@ -11,6 +11,8 @@ import (
 
 type TransferRepository interface {
 	Create(payload dto.TransferRequest, send, receive model.User) (model.Transfer, error)
+	GetSend(id string, page int) ([]model.Transfer, error)
+	GetReceive(id string, page int) ([]model.Transfer, error)
 }
 
 type transferRepository struct {
@@ -82,6 +84,53 @@ func (t *transferRepository) Create(payload dto.TransferRequest, send, receive m
 	return response, nil
 }
 
+func (t *transferRepository) GetSend(id string, page int) ([]model.Transfer, error) {
+	var datas []model.Transfer
+	paging := 3
+	limit := (paging * page) - paging
+
+	res, err := t.db.Query(`SELECT id,user_id,tujuan_transfer,jumlah_transfer,jenis_transfer
+	FROM trx_send_transfer WHERE user_id = $1 ORDER BY transfer_at DESC LIMIT $2 OFFSET $3`, id, paging, limit)
+	if err != nil {
+		return []model.Transfer{}, err
+	}
+	defer res.Close()
+
+	for res.Next() {
+		var data model.Transfer
+		err := res.Scan(&data.Id, &data.UserId, &data.TujuanTransfer, &data.JumlahTransfer, &data.JenisTransfer)
+		if err != nil {
+			return []model.Transfer{}, err
+		}
+		datas = append(datas, data)
+	}
+
+	return datas, nil
+}
+
+func (t *transferRepository) GetReceive(id string, page int) ([]model.Transfer, error) {
+	var datas []model.Transfer
+	paging := 3
+	limit := (paging * page) - paging
+
+	res, err := t.db.Query(`SELECT id,user_id,trx_id,tujuan_transfer,jumlah_transfer,jenis_transfer
+	FROM trx_receive_transfer WHERE user_id = $1 ORDER BY transfer_at DESC LIMIT $2 OFFSET $3`, id, paging, limit)
+	if err != nil {
+		return []model.Transfer{}, err
+	}
+	defer res.Close()
+
+	for res.Next() {
+		var data model.Transfer
+		err := res.Scan(&data.Id, &data.UserId, &data.Trx_id, &data.TujuanTransfer, &data.JumlahTransfer, &data.JenisTransfer)
+		if err != nil {
+			return []model.Transfer{}, err
+		}
+		datas = append(datas, data)
+	}
+
+	return datas, nil
+}
 func NewTransferRepository(db *sql.DB) TransferRepository {
 	return &transferRepository{db: db}
 }
