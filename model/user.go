@@ -13,7 +13,6 @@ type User struct {
 	Saldo       int       `json:"saldo,omitempty"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
-	Saldo       int       `json:"saldo"`
 }
 
 type UserResponse struct {
