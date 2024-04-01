@@ -13,11 +13,8 @@ type UserRepository interface {
 	Create(payload model.User) (model.User, error)
 	GetBalance(user_id string) (model.UserSaldo, error)
 	GetByUsername(username string) (model.User, error)
-<<<<<<< HEAD
 	Update(id string, payload model.User) (model.User, error)
-=======
 	Verify(payload dto.VerifyUser) (dto.VerifyUser, error)
->>>>>>> 24410270d6dfce269bde36ee628e3811967ed3a1
 }
 
 type userRepository struct {

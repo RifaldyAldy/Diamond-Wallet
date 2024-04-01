@@ -17,11 +17,8 @@ type UserUseCase interface {
 	LoginUser(in dto.LoginRequestDto) (dto.LoginResponseDto, error)
 	FindById(id string) (model.User, error)
 	GetBalanceCase(id string) (model.UserSaldo, error)
-<<<<<<< HEAD
 	UpdateUser(id string, payload dto.UserRequestDto) (model.User, error)
-=======
 	VerifyUser(payload dto.VerifyUser) (dto.VerifyUser, error)
->>>>>>> 24410270d6dfce269bde36ee628e3811967ed3a1
 }
 
 type userUseCase struct {
