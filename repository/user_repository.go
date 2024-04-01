@@ -7,6 +7,7 @@ import (
 
 	"github.com/RifaldyAldy/diamond-wallet/model"
 	"github.com/RifaldyAldy/diamond-wallet/model/dto"
+	"github.com/lib/pq"
 )
 
 type UserRepository interface {
@@ -138,7 +139,7 @@ func (u *userRepository) GetBalance(user_id string) (model.UserSaldo, error) {
 		&response.Pin,
 	)
 	if response.Pin == "" {
-		return model.UserSaldo{}, fmt.Errorf("penerima harus memverifikasi akun terlebih dahulu")
+		return model.UserSaldo{}, fmt.Errorf("1")
 	}
 	if err != nil {
 		return model.UserSaldo{}, err
@@ -202,6 +203,10 @@ func (u *userRepository) Verify(payload dto.VerifyUser) (dto.VerifyUser, error) 
     `, userId.Id, payload.Nik, payload.JenisKelamin, payload.TanggalLahir, payload.Umur, payload.Photo)
 	if err != nil {
 		tx.Rollback()
+		pgErr, ok := err.(*pq.Error)
+		if ok && pgErr.Code == "23505" {
+			return dto.VerifyUser{}, fmt.Errorf("terjadi duplikat, user ini sudah verifikasi: %s", pgErr.Detail)
+		}
 		return dto.VerifyUser{}, err
 	}
 

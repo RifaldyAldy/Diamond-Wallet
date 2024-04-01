@@ -89,8 +89,25 @@ func (t *transferRepository) GetSend(id string, page int) ([]model.Transfer, err
 	paging := 3
 	limit := (paging * page) - paging
 
-	res, err := t.db.Query(`SELECT id,user_id,tujuan_transfer,jumlah_transfer,jenis_transfer
-	FROM trx_send_transfer WHERE user_id = $1 ORDER BY transfer_at DESC LIMIT $2 OFFSET $3`, id, paging, limit)
+	res, err := t.db.Query(`SELECT 
+		trx.id,
+		trx.user_id,
+		mst_user.name,
+		trx.tujuan_transfer,
+		mst_tujuan.name,
+		trx.jumlah_transfer,
+		trx.jenis_transfer
+	FROM 
+		trx_send_transfer AS trx
+	LEFT JOIN 
+		mst_user ON trx.user_id = mst_user.id
+	LEFT JOIN 
+		mst_user AS mst_tujuan ON trx.tujuan_transfer = mst_tujuan.id
+	WHERE 
+		trx.user_id = $1
+	ORDER BY 
+		trx.transfer_at DESC 
+	LIMIT $2 OFFSET $3`, id, paging, limit)
 	if err != nil {
 		return []model.Transfer{}, err
 	}
@@ -98,7 +115,7 @@ func (t *transferRepository) GetSend(id string, page int) ([]model.Transfer, err
 
 	for res.Next() {
 		var data model.Transfer
-		err := res.Scan(&data.Id, &data.UserId, &data.TujuanTransfer, &data.JumlahTransfer, &data.JenisTransfer)
+		err := res.Scan(&data.Id, &data.UserId, &data.SenderName, &data.TujuanTransfer, &data.Receiver, &data.JumlahTransfer, &data.JenisTransfer)
 		if err != nil {
 			return []model.Transfer{}, err
 		}
@@ -113,8 +130,26 @@ func (t *transferRepository) GetReceive(id string, page int) ([]model.Transfer, 
 	paging := 3
 	limit := (paging * page) - paging
 
-	res, err := t.db.Query(`SELECT id,user_id,trx_id,tujuan_transfer,jumlah_transfer,jenis_transfer
-	FROM trx_receive_transfer WHERE user_id = $1 ORDER BY transfer_at DESC LIMIT $2 OFFSET $3`, id, paging, limit)
+	res, err := t.db.Query(`SELECT 
+		trx.id,
+		trx.user_id,
+		mst_user.name,
+		trx.trx_id,
+		trx.tujuan_transfer,
+		mst_tujuan.name,
+		trx.jumlah_transfer,
+		trx.jenis_transfer
+	FROM 
+    	trx_receive_transfer AS trx
+	LEFT JOIN 
+    	mst_user ON trx.user_id = mst_user.id
+	LEFT JOIN 
+    	mst_user AS mst_tujuan ON trx.tujuan_transfer = mst_tujuan.id
+	WHERE 
+    	trx.user_id = $1
+	ORDER BY 
+    	trx.transfer_at DESC 
+	LIMIT $2 OFFSET $3`, id, paging, limit)
 	if err != nil {
 		return []model.Transfer{}, err
 	}
@@ -122,7 +157,7 @@ func (t *transferRepository) GetReceive(id string, page int) ([]model.Transfer, 
 
 	for res.Next() {
 		var data model.Transfer
-		err := res.Scan(&data.Id, &data.UserId, &data.Trx_id, &data.TujuanTransfer, &data.JumlahTransfer, &data.JenisTransfer)
+		err := res.Scan(&data.Id, &data.UserId, &data.SenderName, &data.Trx_id, &data.TujuanTransfer, &data.Receiver, &data.JumlahTransfer, &data.JenisTransfer)
 		if err != nil {
 			return []model.Transfer{}, err
 		}

@@ -15,7 +15,7 @@ CREATE TABLE mst_user(
 CREATE TABLE mst_user_datas(
  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
  user_id UUID NOT NULl,
- nik VARCHAR(100) NOT NULL,
+ nik VARCHAR(100) UNIQUE NOT NULL,
  jenis_kelamin VARCHAR(10),
  tanggal_lahir TIMESTAMP,
  umur INTEGER,
@@ -39,13 +39,13 @@ CREATE TABLE mst_admin(
  role VARCHAR(5) NOT NULL DEFAULT 'admin',
  email VARCHAR(100) NOT NULL,
  created_at TIMESTAMP NOT NULL,
- update_at TIMESTAMP NOT NULL
+ updated_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE trx_send_transfer(
  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
  user_id UUID NOT NULL,
- id_tujuan_transfer UUID NOT NULL,
+ tujuan_transfer UUID NOT NULL,
  jumlah_transfer BIGINT NOT NULL,
  jenis_transfer VARCHAR(100) NOT NULL,
  transfer_at VARCHAR(100) NOT NULL,

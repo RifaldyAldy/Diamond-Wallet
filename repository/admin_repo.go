@@ -18,12 +18,14 @@ type adminRepository struct {
 }
 
 func (a *adminRepository) Register(payload model.Admin) (model.Admin, error) {
+	payload.CreatedAt = time.Now()
+	payload.UpdatedAt = time.Now()
 	err := a.db.QueryRow(`INSERT INTO mst_admin 
 			(name,role,username,password,email,created_at,updated_at)
 		VALUES
 			($1,$2,$3,$4,$5,$6,$7)
 		RETURNING id
-	`, payload.Name, "admin", payload.Username, payload.Password, payload.Email, time.Now(), time.Now()).Scan(&payload.Id)
+	`, payload.Name, "admin", payload.Username, payload.Password, payload.Email, payload.CreatedAt, payload.UpdatedAt).Scan(&payload.Id)
 
 	if err != nil {
 		return model.Admin{}, err

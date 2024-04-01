@@ -80,6 +80,10 @@ func (u *UserController) CheckBalance(c *gin.Context) {
 	id := claims.(*common.JwtClaim).DataClaims.Id
 	response, err := u.uc.GetBalanceCase(id)
 	if err != nil {
+		if err.Error() == "1" {
+			common.SendErrorResponse(c, http.StatusBadRequest, "Verifikasi akun anda terlebih dahulu untuk akses cek saldo")
+			return
+		}
 		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -118,6 +122,7 @@ func (u *UserController) VerifyHandler(c *gin.Context) {
 	claims, exists := c.Get("claims")
 	if !exists {
 		common.SendErrorResponse(c, http.StatusInternalServerError, "Claims jwt tidak ada!")
+		fmt.Println(2)
 		return
 	}
 	payload, err := common.FileVerifyHandler(c)
@@ -139,6 +144,7 @@ func (p *UserController) UpdatePinHandler(c *gin.Context) {
 	var payload dto.UpdatePinUser
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
 	}
 	claims, exists := c.Get("claims")
 	if !exists {
@@ -150,6 +156,7 @@ func (p *UserController) UpdatePinHandler(c *gin.Context) {
 	fmt.Println("ini payload", payload)
 	if err != nil {
 		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 	fmt.Println("ini response", response)
 

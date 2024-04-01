@@ -34,8 +34,8 @@ func (t *TransferController) TransferHandler(c *gin.Context) {
 		return
 	}
 	receive, err := t.uc.FindById(payload.TujuanTransfer)
-	if err != nil {
-		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+	if err.Error() == "1" {
+		common.SendErrorResponse(c, http.StatusBadRequest, "Penerima harus memverifikasi akun terlebih dahulu")
 		return
 	}
 	sendBalance, _ := t.uc.GetBalanceCase(send.Id)
