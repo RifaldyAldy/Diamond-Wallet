@@ -129,3 +129,8 @@
 [LOG] ::1 - [2024-04-01 16:41:34.295465567 +0700 WIB m=+8.945334466] level=info "PUT /api/v1/users/saldo 200 17.860732ms "PostmanRuntime/7.37.0"
 [LOG] ::1 - [2024-04-01 16:43:18.019201814 +0700 WIB m=+3.109562523] level=info "PUT /api/v1/users/saldo 200 23.313867ms "PostmanRuntime/7.37.0"
 [LOG] ::1 - [2024-04-01 16:44:55.957270896 +0700 WIB m=+22.915812801] level=info "PUT /api/v1/users/saldo 200 11.816999ms "PostmanRuntime/7.37.0"
+[LOG] 127.0.0.1 - [2024-04-01 10:44:08.094498186 +0700 WIB m=+23.068932215] level=info "POST /api/v1/users/login 200 293.241577ms "Thunder Client (https://www.thunderclient.com)"
+[LOG] 127.0.0.1 - [2024-04-01 10:44:29.920264515 +0700 WIB m=+44.894698559] level=info "POST /api/v1/users/verify 201 131.50853ms "Thunder Client (https://www.thunderclient.com)"
+[LOG] 127.0.0.1 - [2024-04-01 10:45:26.899259092 +0700 WIB m=+101.873693137] level=info "POST /api/v1/users/login 200 196.348678ms "Thunder Client (https://www.thunderclient.com)"
+[LOG] 127.0.0.1 - [2024-04-01 10:45:38.374466966 +0700 WIB m=+113.348901009] level=warning "POST /api/v1/transfer/ 400 9.046209ms "Thunder Client (https://www.thunderclient.com)"
+[LOG] 127.0.0.1 - [2024-04-01 10:46:14.024709738 +0700 WIB m=+148.999143773] level=info "POST /api/v1/transfer/ 200 15.501184ms "Thunder Client (https://www.thunderclient.com)"

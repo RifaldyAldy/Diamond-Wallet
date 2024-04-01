@@ -10,6 +10,7 @@ type User struct {
 	Role        string    `json:"role"`
 	Email       string    `json:"email"`
 	PhoneNumber string    `json:"phone_number"`
+	Saldo       int       `json:"saldo,omitempty"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
@@ -32,4 +33,5 @@ type JwtClaims struct {
 type UserSaldo struct {
 	User  UserResponse `json:"user"`
 	Saldo int          `json:"saldo"`
+	Pin   string       `json:"pin"`
 }

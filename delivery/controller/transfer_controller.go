@@ -1,24 +1,71 @@
 package controller
 
 import (
+	"net/http"
+
+	"github.com/RifaldyAldy/diamond-wallet/model/dto"
 	"github.com/RifaldyAldy/diamond-wallet/usecase"
+	"github.com/RifaldyAldy/diamond-wallet/utils/common"
 	"github.com/gin-gonic/gin"
 )
 
 type TransferController struct {
-	uc usecase.TransferUseCase
+	ut usecase.TransferUseCase
+	uc usecase.UserUseCase
 	rg *gin.RouterGroup
 }
 
 // tulis handler code kalian disini
 
+func (t *TransferController) TransferHandler(c *gin.Context) {
+	payload := dto.TransferRequest{}
+	c.ShouldBind(&payload)
+	claims, exists := c.Get("claims")
+	if !exists {
+		common.SendErrorResponse(c, http.StatusBadRequest, "Sepertinya login anda tidak valid")
+		return
+	}
+	claimsJwt := claims.(*common.JwtClaim)
+	payload.UserId = claimsJwt.DataClaims.Id
+	send, err := t.uc.FindById(payload.UserId)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	receive, err := t.uc.FindById(payload.TujuanTransfer)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	sendBalance, _ := t.uc.GetBalanceCase(send.Id)
+	if sendBalance.Pin != payload.Pin { // cek apakah pin di input benar
+		common.SendErrorResponse(c, http.StatusBadRequest, "pin salah!")
+		return
+	}
+	receiveBalance, err := t.uc.GetBalanceCase(receive.Id)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	send.Saldo = sendBalance.Saldo
+	receive.Saldo = receiveBalance.Saldo
+	response, err := t.ut.TransferRequest(payload, send, receive)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(c, "SUCCESS", response)
+}
+
 func (t *TransferController) Route() {
-	// rg := t.rg.Group("/transfer")
+	rg := t.rg.Group("/transfer")
 	{
 		// tulis route disini
+		rg.POST("/", common.JWTAuth("user"), t.TransferHandler)
 	}
 }
 
-func NewTransferController(uc usecase.TransferUseCase, rg *gin.RouterGroup) *TransferController {
-	return &TransferController{uc: uc, rg: rg}
+func NewTransferController(ut usecase.TransferUseCase, uc usecase.UserUseCase, rg *gin.RouterGroup) *TransferController {
+	return &TransferController{uc: uc, ut: ut, rg: rg}
 }

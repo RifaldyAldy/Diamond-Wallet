@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/RifaldyAldy/diamond-wallet/model"
@@ -119,7 +120,8 @@ func (u *userRepository) GetBalance(user_id string) (model.UserSaldo, error) {
 		u.phone_number,
 		u.created_at,
 		u.updated_at,
-		s.saldo
+		s.saldo,
+		s.pin
 	FROM 
    		 mst_user AS u
 	LEFT JOIN 
@@ -133,7 +135,11 @@ func (u *userRepository) GetBalance(user_id string) (model.UserSaldo, error) {
 		&response.User.CreatedAt,
 		&response.User.UpdatedAt,
 		&response.Saldo,
+		&response.Pin,
 	)
+	if response.Pin == "" {
+		return model.UserSaldo{}, fmt.Errorf("penerima harus memverifikasi akun terlebih dahulu")
+	}
 	if err != nil {
 		return model.UserSaldo{}, err
 	}
