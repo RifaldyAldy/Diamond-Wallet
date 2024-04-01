@@ -36,12 +36,13 @@ CREATE TABLE mst_admin(
  name VARCHAR(50) NOT NULL,
  username VARCHAR(100) NOT NULL,
  password VARCHAR(100) NOT NULL,
+ role VARCHAR(5) NOT NULL DEFAULT 'admin',
  email VARCHAR(100) NOT NULL,
  created_at TIMESTAMP NOT NULL,
  update_at TIMESTAMP NOT NULL
 );
 
-CREATE TABLE trx_transfer(
+CREATE TABLE trx_send_transfer(
  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
  user_id UUID NOT NULL,
  id_tujuan_transfer UUID NOT NULL,
@@ -50,6 +51,18 @@ CREATE TABLE trx_transfer(
  transfer_at VARCHAR(100) NOT NULL,
  FOREIGN KEY(tujuan_transfer) REFERENCES mst_user(id),
  FOREIGN KEY(user_id) REFERENCES mst_user(id)
+);
+CREATE TABLE trx_receive_transfer(
+ id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+ trx_id UUID NOT NULL,
+ user_id UUID NOT NULL,
+ tujuan_transfer UUID NOT NULL,
+ jumlah_transfer BIGINT NOT NULL,
+ jenis_transfer VARCHAR(100) NOT NULL,
+ transfer_at VARCHAR(100) NOT NULL,
+ FOREIGN KEY(tujuan_transfer) REFERENCES mst_user(id),
+ FOREIGN KEY(user_id) REFERENCES mst_user(id),
+ FOREIGN KEY(trx_id) REFERENCES trx_send_transfer(id)
 );
 
 CREATE TABLE trx_topup_method_payment(

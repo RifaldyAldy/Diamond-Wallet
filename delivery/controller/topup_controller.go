@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -30,7 +29,6 @@ func (t *TopupController) CreateTopupHandler(c *gin.Context) {
 		return
 	}
 	payload.User.Id = claims.(*common.JwtClaim).DataClaims.Id
-	fmt.Println(payload.User.Id)
 	payload.User, _ = t.uc.FindById(payload.User.Id)
 	res, err := t.ut.CreateTopup(payload)
 	if err != nil {

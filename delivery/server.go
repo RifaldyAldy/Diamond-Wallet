@@ -20,7 +20,7 @@ type Server struct {
 func (s *Server) setupControllers() {
 	rg := s.engine.Group("/api/v1")
 	rg.Use(middleware.LogMiddleware())
-	controller.NewTransferController(s.uc.TransferUseCase(), rg).Route()
+	controller.NewTransferController(s.uc.TransferUseCase(), s.uc.UserUseCase(), rg).Route()
 	controller.NewTopupController(s.uc.TopupUseCase(), s.uc.UserUseCase(), rg).Route()
 	controller.NewUserController(s.uc.UserUseCase(), rg).Route()
 	controller.NewAdminController(s.uc.AdminUseCase(), s.uc.UserUseCase(), rg).Route()
