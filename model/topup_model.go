@@ -15,6 +15,7 @@ type TableTopupPayment struct {
 	OrderId       string    `json:"id"`
 	UserId        string    `json:"user_id"`
 	TokenMidtrans string    `json:"token_midtrans"`
+	Ammount       int64     `json:"ammount"`
 	UrlPayment    string    `json:"url_payment"`
 	Status        string    `json:"status"`
 	Deskripsi     string    `json:"deskripsi"`

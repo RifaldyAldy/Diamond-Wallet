@@ -11,6 +11,7 @@ type TopupUseCase interface {
 	CreateTopup(payload model.TopupModel) (common.ResponseMidtrans, error)
 	FindById(orderId string) (model.TableTopupPayment, error)
 	PaymentUpdate(payload dto.ResponsePayment) (dto.ResponsePayment, error)
+	FindAll(id string, page int) ([]model.TableTopupPayment, error)
 }
 
 type topupUseCase struct {
@@ -43,6 +44,15 @@ func (t *topupUseCase) PaymentUpdate(payload dto.ResponsePayment) (dto.ResponseP
 	}
 
 	return payload, nil
+}
+
+func (t *topupUseCase) FindAll(id string, page int) ([]model.TableTopupPayment, error) {
+	datas, err := t.repo.GetAll(id, page)
+	if err != nil {
+		return []model.TableTopupPayment{}, err
+	}
+
+	return datas, nil
 }
 
 func NewTopupUseCase(repo repository.TopupRepository) TopupUseCase {

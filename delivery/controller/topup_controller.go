@@ -54,12 +54,36 @@ func (t *TopupController) ResponseTopupHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", res)
 }
 
+func (t *TopupController) HistoryTopupHandler(c *gin.Context) {
+	var id string
+	var page int
+	claims, exists := c.Get("claims")
+	if !exists {
+		common.SendErrorResponse(c, http.StatusBadRequest, "Sepertinya login anda tidak valid")
+		return
+	}
+	id = claims.(*common.JwtClaim).DataClaims.Id
+	page, _ = strconv.Atoi(c.Query("page"))
+	if page == 0 {
+		page = 1
+	}
+
+	datas, err := t.ut.FindAll(id, page)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(c, "SUCCESS", datas)
+}
+
 func (t *TopupController) Route() {
 	rg := t.rg.Group("/topup")
 	{
 		//tulis route disini
 		rg.POST("/", common.JWTAuth("user"), t.CreateTopupHandler)
 		rg.GET("/response", t.ResponseTopupHandler)
+		rg.GET("/history", common.JWTAuth("user"), t.HistoryTopupHandler)
 	}
 }
 
