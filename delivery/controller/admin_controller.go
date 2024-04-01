@@ -44,7 +44,7 @@ func (a *AdminController) Route() {
 	rg := a.rg.Group("/admin")
 	{
 		rg.POST("/", a.RegisterHandler)
-		rg.GET("/user/:id", a.GetUserInfo)
+		rg.GET("/user/:id", common.JWTAuth("admin"), a.GetUserInfo)
 	}
 }
 

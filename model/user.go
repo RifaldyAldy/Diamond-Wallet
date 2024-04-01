@@ -12,6 +12,7 @@ type User struct {
 	PhoneNumber string    `json:"phone_number"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	Saldo       int       `json:"saldo"`
 }
 
 type UserResponse struct {

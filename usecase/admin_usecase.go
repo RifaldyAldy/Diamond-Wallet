@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"errors"
+
 	"github.com/RifaldyAldy/diamond-wallet/model"
 	"github.com/RifaldyAldy/diamond-wallet/repository"
 )
@@ -24,7 +26,20 @@ func (a *adminUseCase) RegisterAdmin(payload model.Admin) (model.Admin, error) {
 }
 
 func (a *adminUseCase) GetUserInfo(userID string) (model.User, error) {
-	return a.userRepository.GetByID(userID)
+
+	info := "u.id= '" + userID + "'"
+	limit := 1
+	offset := 0
+
+	users, err := a.userRepository.GetInfoUser(info, limit, offset)
+	if err != nil {
+		return model.User{}, err
+	}
+	if len(users) == 0 {
+		return model.User{}, errors.New("user tidak ada")
+	}
+	return users[0], nil
+
 }
 
 func NewAdminUseCase(repo repository.AdminRepository) AdminUseCase {
