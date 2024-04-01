@@ -15,6 +15,7 @@ type UserRepository interface {
 	GetByUsername(username string) (model.User, error)
 	Update(id string, payload model.User) (model.User, error)
 	Verify(payload dto.VerifyUser) (dto.VerifyUser, error)
+	GetByID(id string) (model.User, error)
 }
 
 type userRepository struct {
@@ -214,6 +215,24 @@ func (u *userRepository) Verify(payload dto.VerifyUser) (dto.VerifyUser, error) 
 	}
 
 	return payload, nil
+}
+
+func (u *userRepository) GetByID(id string) (model.User, error) {
+	var user model.User
+	err := u.db.QueryRow("SELECT id,name,username,role,email,phone_number,created_at,updated_At FROM mst_user WHERE id =$1", id).Scan(
+		&user.Id,
+		&user.Name,
+		&user.Username,
+		&user.Role,
+		&user.Email,
+		&user.PhoneNumber,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+	if err != nil {
+		return model.User{}, err
+	}
+	return user, nil
 }
 
 func NewUserRepository(db *sql.DB) UserRepository {

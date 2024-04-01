@@ -41,6 +41,18 @@ func (a *AdminController) LoginHandler(c *gin.Context) {
 	}
 
 	common.SendSingleResponse(c, "SUCCESS", response)
+
+}
+
+func (a *AdminController) GetUserInfo(c *gin.Context) {
+	userID := c.Param("id")
+
+	user, err := a.ua.GetUserInfo(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, user)
 }
 
 func (a *AdminController) Route() {
@@ -48,6 +60,7 @@ func (a *AdminController) Route() {
 	{
 		rg.POST("/", a.RegisterHandler)
 		rg.POST("/login", a.LoginHandler)
+		rg.GET("/user/:id", a.GetUserInfo)
 	}
 }
 
