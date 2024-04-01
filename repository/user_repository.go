@@ -13,6 +13,7 @@ type UserRepository interface {
 	GetBalance(user_id string) (model.UserSaldo, error)
 	GetByUsername(username string) (model.User, error)
 	Update(id string, payload model.User) (model.User, error)
+	GetByID(id string) (model.User, error)
 }
 
 type userRepository struct {
@@ -161,6 +162,24 @@ func (u *userRepository) Update(id string, payload model.User) (model.User, erro
 		&user.Name,
 		&user.Username,
 		&user.Password,
+		&user.Role,
+		&user.Email,
+		&user.PhoneNumber,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+	if err != nil {
+		return model.User{}, err
+	}
+	return user, nil
+}
+
+func (u *userRepository) GetByID(id string) (model.User, error) {
+	var user model.User
+	err := u.db.QueryRow("SELECT id,name,username,role,email,phone_number,created_at,updated_At FROM mst_user WHERE id =$1", id).Scan(
+		&user.Id,
+		&user.Name,
+		&user.Username,
 		&user.Role,
 		&user.Email,
 		&user.PhoneNumber,

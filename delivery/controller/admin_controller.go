@@ -29,10 +29,22 @@ func (a *AdminController) RegisterHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", res)
 }
 
+func (a *AdminController) GetUserInfo(c *gin.Context) {
+	userID := c.Param("id")
+
+	user, err := a.ua.GetUserInfo(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}
+
 func (a *AdminController) Route() {
 	rg := a.rg.Group("/admin")
 	{
 		rg.POST("/", a.RegisterHandler)
+		rg.GET("/user/:id", a.GetUserInfo)
 	}
 }
 
