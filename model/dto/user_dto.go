@@ -19,3 +19,8 @@ type LoginResponseDto struct {
 	AccessToken string `json:"accessToken"`
 	UserId      string `json:"userId"`
 }
+
+type UpdatePinUser struct {
+	UserId string `json:"user_id"`
+	Pin    string `json:"pin"`
+}

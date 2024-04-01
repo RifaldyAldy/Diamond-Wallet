@@ -16,6 +16,7 @@ type UserRepository interface {
 	Update(id string, payload model.User) (model.User, error)
 	Verify(payload dto.VerifyUser) (dto.VerifyUser, error)
 	GetByID(id string) (model.User, error)
+	UpdatePin(payload dto.UpdatePinUser) (dto.UpdatePinUser, error)
 }
 
 type userRepository struct {
@@ -173,7 +174,6 @@ func (u *userRepository) Update(id string, payload model.User) (model.User, erro
 		return model.User{}, err
 	}
 	return user, nil
-
 }
 
 func (u *userRepository) Verify(payload dto.VerifyUser) (dto.VerifyUser, error) {
@@ -233,6 +233,23 @@ func (u *userRepository) GetByID(id string) (model.User, error) {
 		return model.User{}, err
 	}
 	return user, nil
+}
+
+func (u *userRepository) UpdatePin(payload dto.UpdatePinUser) (dto.UpdatePinUser, error) {
+	var response dto.UpdatePinUser
+	err := u.db.QueryRow(`
+   UPDATE 
+    mst_saldo 
+  SET 
+    pin = $1 
+  WHERE 
+    user_id = $2
+  RETURNING user_id, pin
+    `, payload.Pin, payload.UserId).Scan(&response.UserId, &response.Pin)
+	if err != nil {
+		return dto.UpdatePinUser{}, nil
+	}
+	return response, nil
 }
 
 func NewUserRepository(db *sql.DB) UserRepository {

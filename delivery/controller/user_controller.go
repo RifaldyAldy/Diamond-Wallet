@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/RifaldyAldy/diamond-wallet/model/dto"
@@ -134,6 +135,27 @@ func (u *UserController) VerifyHandler(c *gin.Context) {
 	common.SendCreateResponse(c, "success", response)
 }
 
+func (p *UserController) UpdatePinHandler(c *gin.Context) {
+	var payload dto.UpdatePinUser
+	if err := c.ShouldBindJSON(&payload); err != nil {
+		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+	}
+	claims, exists := c.Get("claims")
+	if !exists {
+		common.SendErrorResponse(c, http.StatusInternalServerError, "Claims jwt tidak ada!")
+		return
+	}
+	payload.UserId = claims.(*common.JwtClaim).DataClaims.Id
+	response, err := p.uc.UpdatePinUser(payload)
+	fmt.Println("ini payload", payload)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+	fmt.Println("ini response", response)
+
+	common.SendSingleResponse(c, "success", response)
+}
+
 func (p *UserController) Route() {
 	p.rg.POST("/users/login", p.loginHandler)
 	p.rg.POST("/users", p.createHandler)
@@ -141,6 +163,7 @@ func (p *UserController) Route() {
 	p.rg.GET("/users/saldo", common.JWTAuth("user"), p.CheckBalance)
 	p.rg.PUT("/users/:id", p.UpdateHandler)
 	p.rg.POST("/users/verify", common.JWTAuth("user"), p.VerifyHandler)
+	p.rg.PUT("/users/pin", common.JWTAuth("user"), p.UpdatePinHandler)
 }
 
 func NewUserController(uc usecase.UserUseCase, rg *gin.RouterGroup) *UserController {
