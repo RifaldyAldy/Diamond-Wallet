@@ -15,6 +15,7 @@ type TopupRepository interface {
 	Create(payload model.TopupModel) (common.ResponseMidtrans, error)
 	Getbyid(orderId string) (model.TableTopupPayment, error)
 	Payment(payload dto.ResponsePayment) (dto.ResponsePayment, error)
+	GetAll(id string, page int) ([]model.TableTopupPayment, error)
 }
 
 type topupRepository struct {
@@ -109,6 +110,46 @@ func (t *topupRepository) Payment(payload dto.ResponsePayment) (dto.ResponsePaym
 	tx.Commit()
 
 	return payload, nil
+}
+
+func (t *topupRepository) GetAll(id string, page int) ([]model.TableTopupPayment, error) {
+	var datas []model.TableTopupPayment
+	paging := 3
+	limit := (paging * page) - paging
+	res, err := t.db.Query(`SELECT 
+		id,
+		user_id,
+		token_midtrans,
+		ammount,
+		deskripsi,
+		status,
+		url_payment,
+		created_at,
+		updated_at
+	FROM
+		trx_topup_method_payment
+	WHERE 
+		user_id = $1
+	ORDER BY created_at DESC
+	LIMIT $2
+	OFFSET $3
+	`, id, paging, limit)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return []model.TableTopupPayment{}, fmt.Errorf("anda belum melakukan topup apapun")
+		}
+		return []model.TableTopupPayment{}, err
+	}
+	for res.Next() {
+		var data model.TableTopupPayment
+
+		err := res.Scan(&data.OrderId, &data.UserId, &data.TokenMidtrans, &data.Ammount, &data.Deskripsi, &data.Status, &data.UrlPayment, &data.Created_at, &data.Updated_at)
+		if err != nil {
+			return []model.TableTopupPayment{}, err
+		}
+		datas = append(datas, data)
+	}
+	return datas, nil
 }
 
 func NewTopUpRepository(db *sql.DB) TopupRepository {
