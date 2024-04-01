@@ -61,6 +61,7 @@ func (a *AdminController) Route() {
 		rg.POST("/", a.RegisterHandler)
 		rg.POST("/login", a.LoginHandler)
 		rg.GET("/user/:id", a.GetUserInfo)
+		rg.GET("/user/:id", common.JWTAuth("admin"), a.GetUserInfo)
 	}
 }
 
