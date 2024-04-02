@@ -55,7 +55,20 @@ func (a *adminUseCase) LoginAdmin(payload dto.LoginRequestDto) (dto.LoginRespons
 
 }
 func (a *adminUseCase) GetUserInfo(userID string) (model.User, error) {
-	return a.userRepository.GetByID(userID)
+
+	info := "u.id= '" + userID + "'"
+	limit := 1
+	offset := 0
+
+	users, err := a.userRepository.GetInfoUser(info, limit, offset)
+	if err != nil {
+		return model.User{}, err
+	}
+	if len(users) == 0 {
+		return model.User{}, errors.New("user tidak ada")
+	}
+	return users[0], nil
+
 }
 
 func NewAdminUseCase(repo repository.AdminRepository) AdminUseCase {
