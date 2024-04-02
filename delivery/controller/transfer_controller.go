@@ -34,8 +34,12 @@ func (t *TransferController) TransferHandler(c *gin.Context) {
 		return
 	}
 	receive, err := t.uc.FindById(payload.TujuanTransfer)
-	if err.Error() == "1" {
-		common.SendErrorResponse(c, http.StatusBadRequest, "Penerima harus memverifikasi akun terlebih dahulu")
+	if err != nil {
+		if err.Error() == "1" {
+			common.SendErrorResponse(c, http.StatusBadRequest, "Penerima harus memverifikasi akun terlebih dahulu")
+			return
+		}
+		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 	sendBalance, _ := t.uc.GetBalanceCase(send.Id)
@@ -105,6 +109,43 @@ func (t *TransferController) GetReceiveTransferHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", datas)
 }
 
+func (t *TransferController) AdminGetSendTransferHandler(c *gin.Context) {
+	var id string
+	var page int
+	page, _ = strconv.Atoi(c.Query("page"))
+
+	if page == 0 {
+		page = 1
+	}
+
+	id = c.Param("id")
+
+	datas, err := t.ut.GetSend(id, page)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	common.SendSingleResponse(c, "SUCCESS", datas)
+}
+
+func (t *TransferController) AdminGetReceiveTransferHandler(c *gin.Context) {
+	var id string
+	var page int
+	page, _ = strconv.Atoi(c.Query("page"))
+
+	if page == 0 {
+		page = 1
+	}
+	id = c.Param("id")
+
+	datas, err := t.ut.GetReceive(id, page)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	common.SendSingleResponse(c, "SUCCESS", datas)
+}
+
 func (t *TransferController) Route() {
 	rg := t.rg.Group("/transfer")
 	{
@@ -114,6 +155,8 @@ func (t *TransferController) Route() {
 		{
 			rh.GET("/send", common.JWTAuth("user"), t.GetSendTransferHandler)
 			rh.GET("/receive", common.JWTAuth("user"), t.GetReceiveTransferHandler)
+			rh.GET("/admin/send/:id", common.JWTAuth("admin"), t.AdminGetSendTransferHandler)
+			rh.GET("/admin/receive/:id", common.JWTAuth("admin"), t.AdminGetReceiveTransferHandler)
 		}
 	}
 }

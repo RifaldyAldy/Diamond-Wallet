@@ -14,7 +14,7 @@ CREATE TABLE mst_user(
 
 CREATE TABLE mst_user_datas(
  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
- user_id UUID NOT NULl,
+ user_id UUID NOT NULl UNIQUE,
  nik VARCHAR(100) UNIQUE NOT NULL,
  jenis_kelamin VARCHAR(10),
  tanggal_lahir TIMESTAMP,
@@ -25,7 +25,7 @@ CREATE TABLE mst_user_datas(
 
 CREATE TABLE mst_saldo(
  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
- user_id UUID NOT NULL,
+ user_id UUID NOT NULL UNIQUE,
  saldo BIGINT   NOT NULL DEFAULT 0,
  pin VARCHAR(6) NOT NULL,
  FOREIGN KEY(user_id) REFERENCES mst_user(id)

@@ -39,14 +39,16 @@ func (t *transferRepository) Create(payload dto.TransferRequest, send, receive m
 		user_id,
 		tujuan_transfer,
 		jumlah_transfer,
-		jenis_transfer
+		jenis_transfer,
+		transfer_at
 		)
 	VALUES (
 		$1,
 		$2,
 		$3,
-		$4
-	) RETURNING id`, send.Id, receive.Id, payload.JumlahTransfer, "mengirim").Scan(&response.Id)
+		$4,
+		$5
+	) RETURNING id`, send.Id, receive.Id, payload.JumlahTransfer, "mengirim", time.Now()).Scan(&response.Id)
 	if err != nil {
 		tx.Rollback()
 		return model.Transfer{}, err
