@@ -148,7 +148,7 @@ func (t *transferRepository) GetReceive(id string, page int) ([]model.Transfer, 
 	LEFT JOIN 
     	mst_user AS mst_tujuan ON trx.tujuan_transfer = mst_tujuan.id
 	WHERE 
-    	trx.user_id = $1
+    	trx.tujuan_transfer = $1
 	ORDER BY 
     	trx.transfer_at DESC 
 	LIMIT $2 OFFSET $3`, id, paging, limit)
