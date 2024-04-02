@@ -87,7 +87,6 @@ func (u *userRepository) Create(payload model.User) (model.User, error) {
 			} else if pgErr.Constraint == "mst_user_username_key" {
 				return model.User{}, fmt.Errorf("username sudah terdaftar")
 			}
-
 		}
 		return model.User{}, err
 	}
@@ -218,7 +217,6 @@ func (u *userRepository) Verify(payload dto.VerifyUser) (dto.VerifyUser, error) 
 			} else if pgErr.Constraint == "mst_user_datas_user_id_key" {
 				return dto.VerifyUser{}, fmt.Errorf("user ini sudah verifikasi")
 			}
-
 		}
 		return dto.VerifyUser{}, err
 	}

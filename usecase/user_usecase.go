@@ -89,7 +89,6 @@ func (u *userUseCase) GetBalanceCase(id string) (model.UserSaldo, error) {
 }
 
 func (u *userUseCase) UpdateUser(id string, payload dto.UserRequestDto) (model.User, error) {
-
 	updatedUser := model.User{
 		Id:          id,
 		Name:        payload.Name,
@@ -103,7 +102,6 @@ func (u *userUseCase) UpdateUser(id string, payload dto.UserRequestDto) (model.U
 		return model.User{}, fmt.Errorf("failed to update user : %v", err.Error())
 	}
 	return user, nil
-
 }
 
 func (u *userUseCase) VerifyUser(payload dto.VerifyUser) (dto.VerifyUser, error) {
