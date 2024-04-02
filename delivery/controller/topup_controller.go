@@ -77,13 +77,32 @@ func (t *TopupController) HistoryTopupHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", datas)
 }
 
+func (t *TopupController) HistoryAdminTopupHandler(c *gin.Context) {
+	var id string
+	var page int
+	id = c.Param("id")
+	page, _ = strconv.Atoi(c.Query("page"))
+	if page == 0 {
+		page = 1
+	}
+
+	datas, err := t.ut.FindAll(id, page)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(c, "SUCCESS", datas)
+}
+
 func (t *TopupController) Route() {
 	rg := t.rg.Group("/topup")
 	{
-		//tulis route disini
+		// tulis route disini
 		rg.POST("/", common.JWTAuth("user"), t.CreateTopupHandler)
 		rg.GET("/response", t.ResponseTopupHandler)
 		rg.GET("/history", common.JWTAuth("user"), t.HistoryTopupHandler)
+		rg.GET("/history/:id", common.JWTAuth("admin"), t.HistoryAdminTopupHandler)
 	}
 }
 
