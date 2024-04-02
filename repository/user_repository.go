@@ -78,6 +78,17 @@ func (u *userRepository) Create(payload model.User) (model.User, error) {
 		&user.UpdatedAt,
 	)
 	if err != nil {
+		pgErr, ok := err.(*pq.Error)
+		if ok && pgErr.Code == "23505" {
+			if pgErr.Constraint == "mst_user_email_key" {
+				return model.User{}, fmt.Errorf("email sudah terdaftar")
+			} else if pgErr.Constraint == "mst_user_phone_number_key" {
+				return model.User{}, fmt.Errorf("phonenumber sudah terdaftar,pakai nomor lain")
+			} else if pgErr.Constraint == "mst_user_username_key" {
+				return model.User{}, fmt.Errorf("username sudah terdaftar")
+			}
+
+		}
 		return model.User{}, err
 	}
 	return user, nil
