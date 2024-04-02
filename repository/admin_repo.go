@@ -26,7 +26,6 @@ func (a *adminRepository) Register(payload model.Admin) (model.Admin, error) {
 			($1,$2,$3,$4,$5,$6,$7)
 		RETURNING id
 	`, payload.Name, "admin", payload.Username, payload.Password, payload.Email, payload.CreatedAt, payload.UpdatedAt).Scan(&payload.Id)
-
 	if err != nil {
 		return model.Admin{}, err
 	}
