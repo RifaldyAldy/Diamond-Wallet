@@ -19,7 +19,7 @@ type UserUseCase interface {
 	GetBalanceCase(id string) (model.UserSaldo, error)
 	UpdateUser(id string, payload dto.UserRequestDto) (model.User, error)
 	VerifyUser(payload dto.VerifyUser) (dto.VerifyUser, error)
-	UpdatePinUser(payload dto.UpdatePinUser) (dto.UpdatePinUser, error)
+	UpdatePinUser(payload dto.UpdatePinRequest) (dto.UpdatePinResponse, error)
 }
 
 type userUseCase struct {
@@ -112,12 +112,11 @@ func (u *userUseCase) VerifyUser(payload dto.VerifyUser) (dto.VerifyUser, error)
 	return response, nil
 }
 
-func (u *userUseCase) UpdatePinUser(payload dto.UpdatePinUser) (dto.UpdatePinUser, error) {
+func (u *userUseCase) UpdatePinUser(payload dto.UpdatePinRequest) (dto.UpdatePinResponse, error) {
 	response, err := u.repo.UpdatePin(payload)
 	if err != nil {
-		return dto.UpdatePinUser{}, err
+		return dto.UpdatePinResponse{}, err
 	}
-	fmt.Println("response usecase", response)
 	return response, nil
 }
 

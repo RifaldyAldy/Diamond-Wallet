@@ -17,7 +17,7 @@ type UserRepository interface {
 	GetByUsername(username string) (model.User, error)
 	Update(id string, payload model.User) (model.User, error)
 	Verify(payload dto.VerifyUser) (dto.VerifyUser, error)
-	UpdatePin(payload dto.UpdatePinUser) (dto.UpdatePinUser, error)
+	UpdatePin(payload dto.UpdatePinRequest) (dto.UpdatePinResponse, error)
 	GetInfoUser(Info string, limit, offset int) ([]model.User, error)
 }
 
@@ -277,8 +277,8 @@ func (u *userRepository) GetInfoUser(info string, limit, offset int) ([]model.Us
 	return users, nil
 }
 
-func (u *userRepository) UpdatePin(payload dto.UpdatePinUser) (dto.UpdatePinUser, error) {
-	var response dto.UpdatePinUser
+func (u *userRepository) UpdatePin(payload dto.UpdatePinRequest) (dto.UpdatePinResponse, error) {
+	var response dto.UpdatePinResponse
 	err := u.db.QueryRow(`
    UPDATE 
     mst_saldo 
@@ -287,9 +287,14 @@ func (u *userRepository) UpdatePin(payload dto.UpdatePinUser) (dto.UpdatePinUser
   WHERE 
     user_id = $2
   RETURNING user_id, pin
-    `, payload.Pin, payload.UserId).Scan(&response.UserId, &response.Pin)
+    `, payload.NewPin,
+		payload.UserId,
+	).Scan(
+		&response.UserId,
+		&response.Pin,
+	)
 	if err != nil {
-		return dto.UpdatePinUser{}, nil
+		return dto.UpdatePinResponse{}, nil
 	}
 	return response, nil
 }
