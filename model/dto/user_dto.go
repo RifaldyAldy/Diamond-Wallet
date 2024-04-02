@@ -20,7 +20,13 @@ type LoginResponseDto struct {
 	UserId      string `json:"userId"`
 }
 
-type UpdatePinUser struct {
+type UpdatePinResponse struct {
 	UserId string `json:"user_id"`
 	Pin    string `json:"pin"`
+}
+
+type UpdatePinRequest struct {
+	UserId string `json:"user_id"`
+	OldPin string `json:"old_pin" binding:"required"`
+	NewPin string `json:"new_pin" binding:"required"`
 }

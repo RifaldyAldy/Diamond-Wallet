@@ -30,24 +30,33 @@ func (e *UserController) getHandler(c *gin.Context) {
 func (e *UserController) createHandler(c *gin.Context) {
 	var payload dto.UserRequestDto
 	if err := c.ShouldBindJSON(&payload); err != nil {
-		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": err.Error(),
+		})
 		return
 	}
 
 	payloadResponse, err := e.uc.CreateUser(payload)
 	if err != nil {
-		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+		})
 		return
 	}
 
-	common.SendSingleResponse(c, "success", payloadResponse)
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "success",
+		"data":    payloadResponse,
+	})
 }
 
 func (u *UserController) loginHandler(c *gin.Context) {
 	var payload dto.LoginRequestDto
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
 	}
 	loginData, err := u.uc.LoginUser(payload)
 	if err != nil {
@@ -84,22 +93,35 @@ func (u *UserController) CheckBalance(c *gin.Context) {
 func (s *UserController) UpdateHandler(c *gin.Context) {
 	claims, exists := c.Get("claims")
 	if !exists {
-		common.SendErrorResponse(c, http.StatusBadRequest, "Invalid Request JWT")
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "Invalid Request JWT",
+		})
 		return
 	}
 	id := claims.(*common.JwtClaim).DataClaims.Id
 	var payload dto.UserRequestDto
 	if err := c.BindJSON(&payload); err != nil {
-		common.SendErrorResponse(c, http.StatusBadRequest, "Invalid Request Payload")
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "Invalid Request Payload",
+		})
 		return
 	}
 
 	updatedUser, err := s.uc.UpdateUser(id, payload)
 	if err != nil {
-		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+		})
 		return
 	}
-	common.SendSingleResponse(c, "success", updatedUser)
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "Update User Succesful",
+		"data":    updatedUser,
+	})
 }
 
 func (u *UserController) VerifyHandler(c *gin.Context) {
@@ -126,7 +148,7 @@ func (u *UserController) VerifyHandler(c *gin.Context) {
 }
 
 func (p *UserController) UpdatePinHandler(c *gin.Context) {
-	var payload dto.UpdatePinUser
+	var payload dto.UpdatePinRequest
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -136,29 +158,34 @@ func (p *UserController) UpdatePinHandler(c *gin.Context) {
 		common.SendErrorResponse(c, http.StatusInternalServerError, "Claims jwt tidak ada!")
 		return
 	}
+
 	payload.UserId = claims.(*common.JwtClaim).DataClaims.Id
+	payloadResponse, _ := p.uc.GetBalanceCase(payload.UserId)
+
+	if payload.OldPin != payloadResponse.Pin {
+		common.SendErrorResponse(c, http.StatusBadRequest, "Old pin not match")
+		return
+	}
+
+	payload.OldPin = payloadResponse.Pin
+
 	response, err := p.uc.UpdatePinUser(payload)
-	fmt.Println("ini payload", payload)
 	if err != nil {
 		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	fmt.Println("ini response", response)
 
 	common.SendSingleResponse(c, "success", response)
 }
 
 func (p *UserController) Route() {
-	rg := p.rg.Group("users")
-	{
-		rg.POST("/login", p.loginHandler)
-		rg.POST("/", p.createHandler)
-		rg.GET("/:id", common.JWTAuth("admin"), p.getHandler)
-		rg.GET("/saldo", common.JWTAuth("user"), p.CheckBalance)
-		rg.PUT("/", common.JWTAuth("user"), p.UpdateHandler)
-		rg.POST("/verify", common.JWTAuth("user"), p.VerifyHandler)
-		rg.PUT("/pin", common.JWTAuth("user"), p.UpdatePinHandler)
-	}
+	p.rg.POST("/users/login", p.loginHandler)
+	p.rg.POST("/users", p.createHandler)
+	p.rg.GET("/users/:id", common.JWTAuth("admin"), p.getHandler)
+	p.rg.GET("/users/saldo", common.JWTAuth("user"), p.CheckBalance)
+	p.rg.PUT("/users", common.JWTAuth("user"), p.UpdateHandler)
+	p.rg.POST("/users/verify", common.JWTAuth("user"), p.VerifyHandler)
+	p.rg.PUT("/users/pin", common.JWTAuth("user"), p.UpdatePinHandler)
 }
 
 func NewUserController(uc usecase.UserUseCase, rg *gin.RouterGroup) *UserController {
