@@ -48,7 +48,7 @@ func JWTAuth(roles ...string) gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 		if !strings.Contains(authHeader, "Bearer") {
 			SendErrorResponse(c, http.StatusForbidden, "Invalid Token")
-
+			c.Abort()
 			return
 		}
 
@@ -60,18 +60,20 @@ func JWTAuth(roles ...string) gin.HandlerFunc {
 		})
 		if err != nil {
 			SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+			c.Abort()
 			return
 		}
 
 		if !token.Valid {
 			SendErrorResponse(c, http.StatusUnauthorized, "Unaunthorized user")
-
+			c.Abort()
 			return
 		}
 
 		expiredAt := claims.ExpiresAt
 		if time.Now().Unix() > expiredAt {
 			SendErrorResponse(c, http.StatusUnauthorized, "Expired Token")
+			c.Abort()
 			return
 		}
 
@@ -88,6 +90,7 @@ func JWTAuth(roles ...string) gin.HandlerFunc {
 		}
 		if !validRole {
 			SendErrorResponse(c, http.StatusForbidden, "You dont have permission")
+			c.Abort()
 			return
 		}
 

@@ -54,15 +54,14 @@ func (u *userRepository) Create(payload model.User) (model.User, error) {
 	var user model.User
 	err := u.db.QueryRow(`
   INSERT INTO mst_user
-    (name, username, password, role, email, phone_number, created_at, updated_at)
+    (name, username, password, email, phone_number, created_at, updated_at)
   VALUES
-    ($1, $2, $3, $4, $5, $6, $7, $8)
+    ($1, $2, $3, $4, $5, $6, $7)
     RETURNING id, name, username, password, role, email, phone_number, created_at, updated_at
     `,
 		payload.Name,
 		payload.Username,
 		payload.Password,
-		payload.Role,
 		payload.Email,
 		payload.PhoneNumber,
 		time.Now(),
@@ -152,15 +151,13 @@ func (u *userRepository) Update(id string, payload model.User) (model.User, erro
 	var user model.User
 	err := u.db.QueryRow(`
   UPDATE mst_user SET
-    name = $1, username = $2, password=$3, role=$4, email=$5, phone_number=$6, created_at=$7, updated_at=$8 
-	WHERE id=$9
+    name = $1, username = $2, email=$3, phone_number=$4, created_at=$5, updated_at=$6 
+	WHERE id=$7
     RETURNING id, name, username, password, role, email, phone_number, created_at, updated_at
 		
     `,
 		payload.Name,
 		payload.Username,
-		payload.Password,
-		payload.Role,
 		payload.Email,
 		payload.PhoneNumber,
 		time.Now(),
@@ -205,7 +202,12 @@ func (u *userRepository) Verify(payload dto.VerifyUser) (dto.VerifyUser, error) 
 		tx.Rollback()
 		pgErr, ok := err.(*pq.Error)
 		if ok && pgErr.Code == "23505" {
-			return dto.VerifyUser{}, fmt.Errorf("terjadi duplikat, user ini sudah verifikasi: %s", pgErr.Detail)
+			if pgErr.Constraint == "mst_user_datas_nik_key" {
+				return dto.VerifyUser{}, fmt.Errorf("nik sudah terdaftar: %s", pgErr.Detail)
+			} else if pgErr.Constraint == "mst_user_datas_user_id_key" {
+				return dto.VerifyUser{}, fmt.Errorf("user ini sudah verifikasi")
+			}
+
 		}
 		return dto.VerifyUser{}, err
 	}

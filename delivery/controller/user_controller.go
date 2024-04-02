@@ -18,7 +18,7 @@ type UserController struct {
 func (e *UserController) getHandler(c *gin.Context) {
 	id := c.Param("id")
 
-	response, err := e.uc.FindById(id)
+	response, err := e.uc.GetBalanceCase(id)
 	if err != nil {
 		common.SendErrorResponse(c, http.StatusInternalServerError, "Error "+err.Error())
 		return
@@ -61,12 +61,11 @@ func (u *UserController) loginHandler(c *gin.Context) {
 	loginData, err := u.uc.LoginUser(payload)
 	if err != nil {
 		if err.Error() == "1" {
-			common.SendErrorResponse(c, http.StatusForbidden, err.Error())
+			common.SendErrorResponse(c, http.StatusForbidden, "Password salah")
 			return
 		}
-	}
-	if err != nil {
-		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		common.SendErrorResponse(c, http.StatusForbidden, err.Error())
+		return
 	}
 	common.SendSingleResponse(c, "success", loginData)
 }
@@ -92,7 +91,15 @@ func (u *UserController) CheckBalance(c *gin.Context) {
 }
 
 func (s *UserController) UpdateHandler(c *gin.Context) {
-	id := c.Param("id")
+	claims, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"code":    http.StatusBadRequest,
+			"message": "Invalid Request JWT",
+		})
+		return
+	}
+	id := claims.(*common.JwtClaim).DataClaims.Id
 	var payload dto.UserRequestDto
 	if err := c.BindJSON(&payload); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -166,9 +173,9 @@ func (p *UserController) UpdatePinHandler(c *gin.Context) {
 func (p *UserController) Route() {
 	p.rg.POST("/users/login", p.loginHandler)
 	p.rg.POST("/users", p.createHandler)
-	p.rg.GET("/users/:id", p.getHandler)
+	p.rg.GET("/users/:id", common.JWTAuth("admin"), p.getHandler)
 	p.rg.GET("/users/saldo", common.JWTAuth("user"), p.CheckBalance)
-	p.rg.PUT("/users/:id", p.UpdateHandler)
+	p.rg.PUT("/users", common.JWTAuth("user"), p.UpdateHandler)
 	p.rg.POST("/users/verify", common.JWTAuth("user"), p.VerifyHandler)
 	p.rg.PUT("/users/pin", common.JWTAuth("user"), p.UpdatePinHandler)
 }

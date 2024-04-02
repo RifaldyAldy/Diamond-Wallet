@@ -89,16 +89,11 @@ func (u *userUseCase) GetBalanceCase(id string) (model.UserSaldo, error) {
 }
 
 func (u *userUseCase) UpdateUser(id string, payload dto.UserRequestDto) (model.User, error) {
-	hashPassword, err := encryption.HashPassword(payload.Password)
-	if err != nil {
-		return model.User{}, err
-	}
 
 	updatedUser := model.User{
 		Id:          id,
 		Name:        payload.Name,
 		Username:    payload.Username,
-		Password:    hashPassword,
 		Role:        payload.Role,
 		Email:       payload.Email,
 		PhoneNumber: payload.PhoneNumber,

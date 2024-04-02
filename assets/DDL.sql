@@ -3,11 +3,11 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE mst_user(
  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
  name VARCHAR(100) NOT NULL,
- username VARCHAR(100) NOT NULL,
+ username VARCHAR(100) NOT NULL UNIQUE,
  password VARCHAR(100) NOT NULL,
  role VARCHAR(100) NOT NULL,
- email VARCHAR(100) NOT NULL, 
- phone_number VARCHAR(100) NOT NULL,
+ email VARCHAR(100) NOT NULL UNIQUE, 
+ phone_number VARCHAR(100) NOT NULL UNIQUE,
  created_at TIMESTAMP,
  updated_at TIMESTAMP
 );
@@ -68,11 +68,11 @@ CREATE TABLE trx_receive_transfer(
 CREATE TABLE trx_topup_method_payment(
  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
  user_id UUID NOT NULL,
- token_midtrans VARCHAR(255) NOT NULL,
+ token_midtrans VARCHAR(255),
  ammount BIGINT NOT NULL,
  deskripsi VARCHAR(250) ,
  status VARCHAR(100) NOT NULL,
- url_payment VARCHAR(255) NOT NULL,
+ url_payment VARCHAR(255),
  created_at TIMESTAMP,
  updated_at TIMESTAMP,
  FOREIGN KEY(user_id) REFERENCES mst_user(id)
