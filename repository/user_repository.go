@@ -311,7 +311,7 @@ func (u *userRepository) GetRekening(id string) (model.Rekening, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return model.Rekening{}, fmt.Errorf("rekening tidak ada, silahkan atur rekening anda")
+			return model.Rekening{}, fmt.Errorf("1")
 		}
 		return model.Rekening{}, err
 	}

@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"database/sql"
 	"net/http"
 	"strconv"
 
@@ -167,10 +166,12 @@ func (t *TransferController) WithdrawHander(c *gin.Context) {
 	payload.UserId = claims.(*common.JwtClaim).DataClaims.Id
 	_, err := t.uc.FindRekening(payload.UserId)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+		if err.Error() == "1" {
+			common.SendErrorResponse(c, http.StatusBadRequest, "rekening tidak ada, silahkan atur rekening anda")
 			return
 		}
+		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
 	}
 
 	saldo, _ := t.uc.GetBalanceCase(payload.UserId)
