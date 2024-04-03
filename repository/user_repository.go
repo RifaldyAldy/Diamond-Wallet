@@ -161,23 +161,19 @@ func (u *userRepository) Update(id string, payload model.User) (model.User, erro
 	var user model.User
 	err := u.db.QueryRow(`
   UPDATE mst_user SET
-    name = $1, username = $2, email=$3, phone_number=$4, created_at=$5, updated_at=$6 
-	WHERE id=$7
-    RETURNING id, name, username, password, role, email, phone_number, created_at, updated_at
+    name = $1, email=$2, phone_number=$3, updated_at=$4 
+	WHERE id=$5
+    RETURNING id, name, role, email, phone_number, created_at, updated_at
 		
     `,
 		payload.Name,
-		payload.Username,
 		payload.Email,
 		payload.PhoneNumber,
-		time.Now(),
 		time.Now(),
 		id,
 	).Scan(
 		&user.Id,
 		&user.Name,
-		&user.Username,
-		&user.Password,
 		&user.Role,
 		&user.Email,
 		&user.PhoneNumber,

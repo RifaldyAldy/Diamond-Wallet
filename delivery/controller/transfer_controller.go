@@ -30,6 +30,10 @@ func (t *TransferController) TransferHandler(c *gin.Context) {
 	payload.UserId = claimsJwt.DataClaims.Id
 	send, err := t.uc.FindById(payload.UserId)
 	if err != nil {
+		if err.Error() == "1" {
+			common.SendErrorResponse(c, http.StatusBadRequest, "Anda harus memverifikasi akun terlebih dahulu")
+			return
+		}
 		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -49,6 +53,10 @@ func (t *TransferController) TransferHandler(c *gin.Context) {
 	}
 	receiveBalance, err := t.uc.GetBalanceCase(receive.Id)
 	if err != nil {
+		if err.Error() == "1" {
+			common.SendErrorResponse(c, http.StatusBadRequest, "Penerima harus memverifikasi akun terlebih dahulu")
+			return
+		}
 		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}

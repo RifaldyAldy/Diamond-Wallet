@@ -30,33 +30,24 @@ func (e *UserController) getHandler(c *gin.Context) {
 func (e *UserController) createHandler(c *gin.Context) {
 	var payload dto.UserRequestDto
 	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code":    http.StatusBadRequest,
-			"message": err.Error(),
-		})
+		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	payloadResponse, err := e.uc.CreateUser(payload)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
-		})
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"code":    http.StatusOK,
-		"message": "success",
-		"data":    payloadResponse,
-	})
+	common.SendCreateResponse(c, "SUCCESS", payloadResponse)
 }
 
 func (u *UserController) loginHandler(c *gin.Context) {
 	var payload dto.LoginRequestDto
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
 	}
 	loginData, err := u.uc.LoginUser(payload)
 	if err != nil {
@@ -93,35 +84,22 @@ func (u *UserController) CheckBalance(c *gin.Context) {
 func (s *UserController) UpdateHandler(c *gin.Context) {
 	claims, exists := c.Get("claims")
 	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code":    http.StatusBadRequest,
-			"message": "Invalid Request JWT",
-		})
+		common.SendErrorResponse(c, http.StatusBadRequest, "sepertinya login anda tidak valid")
 		return
 	}
 	id := claims.(*common.JwtClaim).DataClaims.Id
 	var payload dto.UserRequestDto
 	if err := c.BindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code":    http.StatusBadRequest,
-			"message": "Invalid Request Payload",
-		})
+		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	updatedUser, err := s.uc.UpdateUser(id, payload)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
-		})
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"code":    http.StatusOK,
-		"message": "Update User Succesful",
-		"data":    updatedUser,
-	})
+	common.SendSingleResponse(c, "UPDATE SUCCESS", updatedUser)
 }
 
 func (u *UserController) VerifyHandler(c *gin.Context) {
