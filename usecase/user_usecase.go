@@ -22,6 +22,8 @@ type UserUseCase interface {
 	UpdateUser(id string, payload dto.UserRequestDto) (model.User, error)
 	VerifyUser(payload dto.VerifyUser) (dto.VerifyUser, error)
 	UpdatePinUser(payload dto.UpdatePinRequest) (dto.UpdatePinResponse, error)
+	FindRekening(id string) (model.Rekening, error)
+	CreateRekening(payload model.Rekening) (model.Rekening, error)
 }
 
 type userUseCase struct {
@@ -128,6 +130,23 @@ func (u *userUseCase) UpdatePinUser(payload dto.UpdatePinRequest) (dto.UpdatePin
 		return dto.UpdatePinResponse{}, err
 	}
 	return response, nil
+}
+
+func (u *userUseCase) FindRekening(id string) (model.Rekening, error) {
+	res, err := u.repo.GetRekening(id)
+	if err != nil {
+		return model.Rekening{}, err
+	}
+	return res, nil
+}
+
+func (u *userUseCase) CreateRekening(payload model.Rekening) (model.Rekening, error) {
+	res, err := u.repo.CreateRekening(payload)
+	if err != nil {
+		return model.Rekening{}, err
+	}
+
+	return res, nil
 }
 
 func NewUserUseCase(repo repository.UserRepository) UserUseCase {

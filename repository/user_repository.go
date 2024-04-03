@@ -19,6 +19,8 @@ type UserRepository interface {
 	Verify(payload dto.VerifyUser) (dto.VerifyUser, error)
 	UpdatePin(payload dto.UpdatePinRequest) (dto.UpdatePinResponse, error)
 	GetInfoUser(Info string, limit, offset int) ([]model.User, error)
+	GetRekening(id string) (model.Rekening, error)
+	CreateRekening(payload model.Rekening) (model.Rekening, error)
 }
 
 type userRepository struct {
@@ -296,6 +298,38 @@ func (u *userRepository) UpdatePin(payload dto.UpdatePinRequest) (dto.UpdatePinR
 		return dto.UpdatePinResponse{}, nil
 	}
 	return response, nil
+}
+
+func (u *userRepository) GetRekening(id string) (model.Rekening, error) {
+	response := model.Rekening{}
+	err := u.db.QueryRow(`SELECT * FROM mst_rekening_user WHERE user_id = $1`, id).Scan(&response.Id,
+		&response.UserId,
+		&response.Rekening,
+		&response.Created_at,
+		&response.Updated_at,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return model.Rekening{}, fmt.Errorf("rekening tidak ada, silahkan atur rekening anda")
+		}
+		return model.Rekening{}, err
+	}
+
+	return response, nil
+}
+
+func (u *userRepository) CreateRekening(payload model.Rekening) (model.Rekening, error) {
+	err := u.db.QueryRow(`INSERT INTO mst_rekening_user (user_id,rekening,created_at,updated_at)
+	VALUES
+		($1,$2,$3,$4)
+	RETURNING id,created_at,updated_at
+	`, payload.UserId, payload.Rekening, time.Now(), time.Now()).Scan(&payload.Id, &payload.Created_at, &payload.Updated_at)
+	if err != nil {
+		return model.Rekening{}, err
+	}
+
+	return payload, nil
 }
 
 func NewUserRepository(db *sql.DB) UserRepository {

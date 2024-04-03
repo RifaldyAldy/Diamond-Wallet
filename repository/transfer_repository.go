@@ -13,6 +13,7 @@ type TransferRepository interface {
 	Create(payload dto.TransferRequest, send, receive model.User) (model.Transfer, error)
 	GetSend(id string, page int) ([]model.Transfer, error)
 	GetReceive(id string, page int) ([]model.Transfer, error)
+	CreateWithdraw(payload model.Withdraw, saldo model.UserSaldo) (model.Withdraw, error)
 }
 
 type transferRepository struct {
@@ -167,6 +168,34 @@ func (t *transferRepository) GetReceive(id string, page int) ([]model.Transfer, 
 	}
 
 	return datas, nil
+}
+
+func (t *transferRepository) CreateWithdraw(payload model.Withdraw, saldo model.UserSaldo) (model.Withdraw, error) {
+	response := model.Withdraw{}
+	tx, _ := t.db.Begin()
+	err := tx.QueryRow(`INSERT INTO withdraw_saldo (user_id,withdraw,created_at)
+	VALUES
+		($1,$2,$3)
+	RETURNING 
+		id,user_id,withdraw,created_at`, payload.UserId, payload.Withdraw, time.Now()).Scan(
+		&response.Id,
+		&response.UserId,
+		&response.Withdraw,
+		&response.Created_at,
+	)
+	if err != nil {
+		tx.Rollback()
+		return model.Withdraw{}, err
+	}
+	_, err = tx.Exec(`UPDATE mst_saldo SET saldo=$1 WHERE user_id=$2`, saldo.Saldo, payload.UserId)
+	if err != nil {
+		tx.Rollback()
+		return model.Withdraw{}, err
+	}
+
+	tx.Commit()
+
+	return response, nil
 }
 func NewTransferRepository(db *sql.DB) TransferRepository {
 	return &transferRepository{db: db}

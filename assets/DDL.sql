@@ -14,13 +14,31 @@ CREATE TABLE mst_user(
 
 CREATE TABLE mst_user_datas(
  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
- user_id UUID NOT NULl UNIQUE,
+ user_id UUID NOT NULL UNIQUE,
  nik VARCHAR(100) UNIQUE NOT NULL,
  jenis_kelamin VARCHAR(10),
  tanggal_lahir DATE,
  umur INTEGER,
  photo VARCHAR(100),
  FOREIGN KEY(user_id) REFERENCES mst_user(id)
+);
+
+CREATE TABLE mst_rekening_user(
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULl UNIQUE,
+    rekening VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES mst_user(id)
+);
+
+CREATE TABLE withdraw_saldo(
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL,
+    withdraw BIGINT NOT NULL,
+    rekening VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES mst_user(id)
 );
 
 CREATE TABLE mst_saldo(

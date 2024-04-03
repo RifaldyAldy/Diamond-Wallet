@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/RifaldyAldy/diamond-wallet/model"
 	"github.com/RifaldyAldy/diamond-wallet/model/dto"
 	"github.com/RifaldyAldy/diamond-wallet/usecase"
 	"github.com/RifaldyAldy/diamond-wallet/utils/common"
@@ -156,6 +157,44 @@ func (p *UserController) UpdatePinHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "success", response)
 }
 
+func (p *UserController) CreateRekeningHandler(c *gin.Context) {
+	var payload model.Rekening
+	err := c.ShouldBind(&payload)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	claims, exists := c.Get("claims")
+	if !exists {
+		common.SendErrorResponse(c, http.StatusUnauthorized, "sepertinya login anda tidak valid")
+		return
+	}
+	payload.UserId = claims.(*common.JwtClaim).DataClaims.Id
+	res, err := p.uc.CreateRekening(payload)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	common.SendCreateResponse(c, "SUCCESS", res)
+}
+
+func (p *UserController) GetRekeningHandler(c *gin.Context) {
+	claims, exists := c.Get("claims")
+	if !exists {
+		common.SendErrorResponse(c, http.StatusUnauthorized, "sepertinya login anda tidak valid")
+		return
+	}
+	id := claims.(*common.JwtClaim).DataClaims.Id
+	res, err := p.uc.FindRekening(id)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(c, "SUCCESS", res)
+}
+
 func (p *UserController) Route() {
 	p.rg.POST("/users/login", p.loginHandler)
 	p.rg.POST("/users", p.createHandler)
@@ -164,6 +203,9 @@ func (p *UserController) Route() {
 	p.rg.PUT("/users", common.JWTAuth("user"), p.UpdateHandler)
 	p.rg.POST("/users/verify", common.JWTAuth("user"), p.VerifyHandler)
 	p.rg.PUT("/users/pin", common.JWTAuth("user"), p.UpdatePinHandler)
+	p.rg.POST("/users/rekening", common.JWTAuth("user"), p.CreateRekeningHandler)
+	p.rg.GET("/users/rekening", common.JWTAuth("user"), p.GetRekeningHandler)
+
 }
 
 func NewUserController(uc usecase.UserUseCase, rg *gin.RouterGroup) *UserController {

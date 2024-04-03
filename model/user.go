@@ -35,3 +35,11 @@ type UserSaldo struct {
 	Saldo int          `json:"saldo"`
 	Pin   string       `json:"pin"`
 }
+
+type Rekening struct {
+	Id         string    `json:"id"`
+	UserId     string    `json:"user_id"`
+	Rekening   string    `json:"rekening"`
+	Created_at time.Time `json:"created_at"`
+	Updated_at time.Time `json:"updated_at"`
+}

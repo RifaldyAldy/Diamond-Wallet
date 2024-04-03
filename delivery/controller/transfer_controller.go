@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"database/sql"
 	"net/http"
 	"strconv"
 
+	"github.com/RifaldyAldy/diamond-wallet/model"
 	"github.com/RifaldyAldy/diamond-wallet/model/dto"
 	"github.com/RifaldyAldy/diamond-wallet/usecase"
 	"github.com/RifaldyAldy/diamond-wallet/utils/common"
@@ -154,11 +156,44 @@ func (t *TransferController) AdminGetReceiveTransferHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", datas)
 }
 
+func (t *TransferController) WithdrawHander(c *gin.Context) {
+	payload := model.Withdraw{}
+	c.ShouldBind(&payload)
+	claims, exists := c.Get("claims")
+	if !exists {
+		common.SendErrorResponse(c, http.StatusBadRequest, "Sepertinya login anda tidak valid")
+		return
+	}
+	payload.UserId = claims.(*common.JwtClaim).DataClaims.Id
+	_, err := t.uc.FindRekening(payload.UserId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
+	}
+
+	saldo, _ := t.uc.GetBalanceCase(payload.UserId)
+	saldo.Saldo -= payload.Withdraw
+	if saldo.Saldo < 0 {
+		common.SendErrorResponse(c, http.StatusBadRequest, "saldo anda tidak mencukup untuk transfer")
+		return
+	}
+	response, err := t.ut.Withdraw(payload, saldo)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	common.SendCreateResponse(c, "SUCCESS", response)
+}
+
 func (t *TransferController) Route() {
 	rg := t.rg.Group("/transfer")
 	{
 		// tulis route disini
 		rg.POST("/", common.JWTAuth("user"), t.TransferHandler)
+		rg.POST("/withdraw", common.JWTAuth("user"), t.WithdrawHander)
 		rh := rg.Group("/history")
 		{
 			rh.GET("/send", common.JWTAuth("user"), t.GetSendTransferHandler)
