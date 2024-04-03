@@ -2,6 +2,8 @@ package usecase
 
 import (
 	"errors"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/RifaldyAldy/diamond-wallet/model"
@@ -41,8 +43,8 @@ func (a *adminUseCase) LoginAdmin(payload dto.LoginRequestDto) (dto.LoginRespons
 		return dto.LoginResponseDto{}, errors.New("password salah")
 	}
 
-	loginExpDuration := time.Duration(10) * time.Minute
-	expiredAt := time.Now().Add(loginExpDuration).Unix()
+	loginExpDuration, _ := strconv.Atoi(os.Getenv("TOKEN_LIFE_TIME"))
+	expiredAt := time.Now().Add(time.Duration(loginExpDuration) * time.Minute).Unix()
 	// TODO: tempel generate token jwt
 	accessToken, err := common.GenerateTokenJwt(response.Id, response.Name, response.Role, expiredAt)
 	if err != nil {

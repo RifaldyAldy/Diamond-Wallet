@@ -195,6 +195,9 @@ func (u *userRepository) Verify(payload dto.VerifyUser) (dto.VerifyUser, error) 
 	if err != nil {
 		return dto.VerifyUser{}, err
 	}
+	if payload.Pin == "" {
+		return dto.VerifyUser{}, fmt.Errorf("pin harus diisi")
+	}
 
 	userId, err := u.Get(payload.UserId)
 	if err != nil {

@@ -17,7 +17,7 @@ CREATE TABLE mst_user_datas(
  user_id UUID NOT NULl UNIQUE,
  nik VARCHAR(100) UNIQUE NOT NULL,
  jenis_kelamin VARCHAR(10),
- tanggal_lahir TIMESTAMP,
+ tanggal_lahir DATE,
  umur INTEGER,
  photo VARCHAR(100),
  FOREIGN KEY(user_id) REFERENCES mst_user(id)
