@@ -15,7 +15,7 @@ CREATE TABLE mst_user(
 CREATE TABLE mst_user_datas(
  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
  user_id UUID NOT NULL UNIQUE,
- nik VARCHAR(100) UNIQUE NOT NULL,
+ nik VARCHAR(16) UNIQUE NOT NULL,
  jenis_kelamin VARCHAR(10),
  tanggal_lahir DATE,
  umur INTEGER,
@@ -25,8 +25,8 @@ CREATE TABLE mst_user_datas(
 
 CREATE TABLE mst_rekening_user(
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULl UNIQUE,
-    rekening VARCHAR(50) NOT NULL,
+    user_id UUID NOT NULL UNIQUE,
+    rekening VARCHAR(20) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     FOREIGN KEY(user_id) REFERENCES mst_user(id)
@@ -36,7 +36,7 @@ CREATE TABLE withdraw_saldo(
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL,
     withdraw BIGINT NOT NULL,
-    rekening VARCHAR(50) NOT NULL,
+    rekening VARCHAR(20) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     FOREIGN KEY(user_id) REFERENCES mst_user(id)
 );
@@ -66,7 +66,7 @@ CREATE TABLE trx_send_transfer(
  tujuan_transfer UUID NOT NULL,
  jumlah_transfer BIGINT NOT NULL,
  jenis_transfer VARCHAR(100) NOT NULL,
- transfer_at VARCHAR(100) NOT NULL,
+ transfer_at VARCHAR(50) NOT NULL,
  FOREIGN KEY(tujuan_transfer) REFERENCES mst_user(id),
  FOREIGN KEY(user_id) REFERENCES mst_user(id)
 );

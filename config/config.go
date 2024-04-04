@@ -14,12 +14,13 @@ type ApiConfig struct {
 }
 
 type DbConfig struct {
-	Host   string
-	Port   string
-	Name   string
-	User   string
-	Pass   string
-	Driver string
+	Host    string
+	Port    string
+	Name    string
+	User    string
+	Pass    string
+	Driver  string
+	JwtLife int
 }
 
 type LogFileConfig struct {
@@ -44,32 +45,29 @@ func (c *Config) readConfig() error {
 		return err
 	}
 
+	lifetime, _ := strconv.Atoi(os.Getenv("TOKEN_LIFE_TIME"))
 	c.ApiConfig = ApiConfig{
 		ApiPort: os.Getenv("API_PORT"),
 	}
 
 	c.DbConfig = DbConfig{
-		Host:   os.Getenv("DB_HOST"),
-		Port:   os.Getenv("DB_PORT"),
-		Name:   os.Getenv("DB_NAME"),
-		User:   os.Getenv("DB_USER"),
-		Driver: os.Getenv("DB_DRIVER"),
-		Pass:   os.Getenv("PASSWORD"),
+		Host:    os.Getenv("DB_HOST"),
+		Port:    os.Getenv("DB_PORT"),
+		Name:    os.Getenv("DB_NAME"),
+		User:    os.Getenv("DB_USER"),
+		Driver:  os.Getenv("DB_DRIVER"),
+		Pass:    os.Getenv("DB_PASSWORD"),
+		JwtLife: lifetime,
 	}
 
 	c.LogFileConfig = LogFileConfig{
 		FilePath: os.Getenv("LOG_FILE"),
 	}
 
-	tokenLifeTime, err := strconv.Atoi(os.Getenv("TOKEN_LIFE_TIME"))
-	if err != nil {
-		return err
-	}
-
 	c.TokenConfig = TokenConfig{
 		IssuerName:      os.Getenv("TOKEN_ISSUE_NAME"),
 		JwtSignatureKey: []byte(os.Getenv("TOKEN_KEY")),
-		JwtLifeTime:     time.Duration(tokenLifeTime) * time.Hour,
+		JwtLifeTime:     time.Duration(c.JwtLife) * time.Hour,
 	}
 
 	if c.ApiPort == "" || c.Host == "" || c.Port == "" || c.Name == "" || c.User == "" || c.FilePath == "" || c.IssuerName == "" ||

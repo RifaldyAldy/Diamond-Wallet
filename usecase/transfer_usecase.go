@@ -11,6 +11,7 @@ type TransferUseCase interface {
 	GetSend(id string, page int) ([]model.Transfer, error)
 	GetReceive(id string, page int) ([]model.Transfer, error)
 	Withdraw(payload model.Withdraw, saldo model.UserSaldo) (model.Withdraw, error)
+	GetAllWithDraw(id string, page int) ([]model.Withdraw, error)
 }
 
 type transferUseCase struct {
@@ -53,6 +54,16 @@ func (t *transferUseCase) Withdraw(payload model.Withdraw, saldo model.UserSaldo
 	}
 
 	return res, nil
+}
+
+func (t *transferUseCase) GetAllWithDraw(id string, page int) ([]model.Withdraw, error) {
+
+	datas, err := t.repo.GetWithdraw(id, page)
+	if err != nil {
+		return []model.Withdraw{}, err
+	}
+
+	return datas, nil
 }
 
 func NewTransferUseCase(repo repository.TransferRepository) TransferUseCase {

@@ -14,6 +14,7 @@ type TransferRepository interface {
 	GetSend(id string, page int) ([]model.Transfer, error)
 	GetReceive(id string, page int) ([]model.Transfer, error)
 	CreateWithdraw(payload model.Withdraw, saldo model.UserSaldo) (model.Withdraw, error)
+	GetWithdraw(id string, page int) ([]model.Withdraw, error)
 }
 
 type transferRepository struct {
@@ -197,6 +198,43 @@ func (t *transferRepository) CreateWithdraw(payload model.Withdraw, saldo model.
 
 	return response, nil
 }
+
+func (t *transferRepository) GetWithdraw(id string, page int) ([]model.Withdraw, error) {
+	var datas []model.Withdraw
+
+	paging := 3
+	limit := (paging * page) - paging
+
+	res, err := t.db.Query(`SELECT 
+		id,
+		user_id,
+		withdraw,
+		created_at
+	FROM 
+    	withdraw_saldo
+	WHERE 
+    	user_id = $1
+	ORDER BY 
+    	created_at DESC 
+	LIMIT $2 OFFSET $3`, id, paging, limit)
+	if err != nil {
+		return []model.Withdraw{}, err
+	}
+	defer res.Close()
+
+	for res.Next() {
+		var data model.Withdraw
+
+		err := res.Scan(&data.Id, &data.UserId, &data.Withdraw, &data.Created_at)
+		if err != nil {
+			return []model.Withdraw{}, err
+		}
+		datas = append(datas, data)
+	}
+
+	return datas, nil
+}
+
 func NewTransferRepository(db *sql.DB) TransferRepository {
 	return &transferRepository{db: db}
 }

@@ -189,12 +189,35 @@ func (t *TransferController) WithdrawHander(c *gin.Context) {
 	common.SendCreateResponse(c, "SUCCESS", response)
 }
 
+func (t *TransferController) GetWithdrawsHandler(c *gin.Context) {
+	var page int
+	page, _ = strconv.Atoi(c.Query("page"))
+	if page == 0 {
+		page = 1
+	}
+	claims, exists := c.Get("claims")
+	if !exists {
+		common.SendErrorResponse(c, http.StatusBadRequest, "Sepertinya login anda tidak valid")
+		return
+	}
+	id := claims.(*common.JwtClaim).DataClaims.Id
+
+	datas, err := t.ut.GetAllWithDraw(id, page)
+	if err != nil {
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	common.SendSingleResponse(c, "SUCCESS", datas)
+}
+
 func (t *TransferController) Route() {
 	rg := t.rg.Group("/transfer")
 	{
 		// tulis route disini
 		rg.POST("/", common.JWTAuth("user"), t.TransferHandler)
 		rg.POST("/withdraw", common.JWTAuth("user"), t.WithdrawHander)
+		rg.GET("/withdraw", common.JWTAuth("user"), t.GetWithdrawsHandler)
 		rh := rg.Group("/history")
 		{
 			rh.GET("/send", common.JWTAuth("user"), t.GetSendTransferHandler)
