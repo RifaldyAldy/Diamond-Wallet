@@ -3,3 +3,6 @@ log.txt
 uploads
 .vscode
 .gitignore
+docker-compose.yml
+Dockerfile
+a.yml
