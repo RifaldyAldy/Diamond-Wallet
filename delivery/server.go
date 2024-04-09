@@ -9,6 +9,8 @@ import (
 	"github.com/RifaldyAldy/diamond-wallet/delivery/middleware"
 	"github.com/RifaldyAldy/diamond-wallet/manager"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Server struct {
@@ -44,7 +46,9 @@ func NewServer() *Server {
 	}
 	repo := manager.NewRepoManager(infra)
 	uc := manager.NewUseCaseManager(repo)
+	//add swagger handler
 	engine := gin.Default()
+	engine.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	host := fmt.Sprintf(":%s", cfg.ApiPort)
 	return &Server{
 		uc:     uc,

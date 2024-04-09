@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -17,7 +18,17 @@ type TopupController struct {
 	rg *gin.RouterGroup
 }
 
-// tulis handler code kalian disini
+// CreateRequestTopup godoc
+// @Tags Topup
+// @Summary User can topup with payment gateway
+// @Description User can topup with payment gateway
+// @Accept json
+// @Produce json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Param 		ammount body dto.TopupRequest true "Ammount topup"
+// @Success 200 {object} common.ResponseMidtrans
+// @Router /topup [post]
 func (t *TopupController) CreateTopupHandler(c *gin.Context) {
 	var payload model.TopupModel
 	var ammount dto.TopupRequest
@@ -54,6 +65,16 @@ func (t *TopupController) ResponseTopupHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", res)
 }
 
+// GetHistoryTopup godoc
+// @Tags Topup
+// @Summary User can get histories topup with payment gateway
+// @Description User can get histories topup with payment gateway
+// @Accept json
+// @Produce json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Success 200 {object} []model.TableTopupPayment
+// @Router /topup/history [get]
 func (t *TopupController) HistoryTopupHandler(c *gin.Context) {
 	var id string
 	var page int
@@ -77,10 +98,22 @@ func (t *TopupController) HistoryTopupHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", datas)
 }
 
+// GetHistoryTopup godoc
+// @Tags Admin
+// @Summary Admin can get user histories topup with payment gateway
+// @Description Admin can get user histories topup with payment gateway
+// @Accept json
+// @Produce json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Param 		id path string true "User id"
+// @Success 200 {object} []model.TableTopupPayment
+// @Router /topup/history/{id} [get]
 func (t *TopupController) HistoryAdminTopupHandler(c *gin.Context) {
 	var id string
 	var page int
 	id = c.Param("id")
+	fmt.Println(id)
 	page, _ = strconv.Atoi(c.Query("page"))
 	if page == 0 {
 		page = 1

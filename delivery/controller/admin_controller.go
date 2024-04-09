@@ -17,6 +17,15 @@ type AdminController struct {
 	rg *gin.RouterGroup
 }
 
+// CreateAdmin godoc
+// @Tags Admin
+// @Summary Admin can create account
+// @Description Admin can create account
+// @Accept json
+// @Produce json
+// @Param payload body dto.AdminRequestDto true "payload register"
+// @Success 201 {object} model.Admin
+// @Router /admin [post]
 func (a *AdminController) RegisterHandler(c *gin.Context) {
 	payload := model.Admin{}
 	c.ShouldBind(&payload)
@@ -27,9 +36,18 @@ func (a *AdminController) RegisterHandler(c *gin.Context) {
 		return
 	}
 
-	common.SendSingleResponse(c, "SUCCESS", res)
+	common.SendCreateResponse(c, "SUCCESS", res)
 }
 
+// AdminLogin godoc
+// @Tags Admin
+// @Summary Admin can login
+// @Description Admin can login
+// @Accept json
+// @Produce json
+// @Param payload body dto.LoginRequestDto true "payload login"
+// @Success 201 {object} dto.LoginResponseDto
+// @Router /admin/login [post]
 func (a *AdminController) LoginHandler(c *gin.Context) {
 	payload := dto.LoginRequestDto{}
 	c.ShouldBind(&payload)
@@ -44,15 +62,26 @@ func (a *AdminController) LoginHandler(c *gin.Context) {
 
 }
 
+// AdminGetInfoUser godoc
+// @Tags Admin
+// @Summary Admin can get info and balance user
+// @Description Admin can get info and balance user
+// @Accept json
+// @Produce json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Param id path string true "User ID"
+// @Success 201 {object} model.User
+// @Router /admin/user/{id} [get]
 func (a *AdminController) GetUserInfo(c *gin.Context) {
 	userID := c.Param("id")
 
-	user, err := a.ua.GetUserInfo(userID)
+	user, err := a.uc.FindById(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		common.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, user)
+	common.SendSingleResponse(c, "SUCCESS", user)
 }
 
 func (a *AdminController) Route() {

@@ -16,6 +16,16 @@ type UserController struct {
 	rg *gin.RouterGroup
 }
 
+// GetBalance 	godoc
+// @Summary 	admin Get balance user with id param.
+// @Description	Return the balance user with jwt id
+// @Produce 	application/json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer"
+// @Param		id path string true "User ID"
+// @Tags 		Admin
+// @Success 	200 {object} model.UserSaldo
+// @Router		/users/{id} [get]
 func (e *UserController) getHandler(c *gin.Context) {
 	id := c.Param("id")
 
@@ -28,6 +38,14 @@ func (e *UserController) getHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "OK", response)
 }
 
+// CreateUser 	godoc
+// @Summary 	User register account.
+// @Description	Return the info user
+// @Produce 	application/json
+// @Param 		User body dto.UserRequestDto true "Create user"
+// @Tags 		User
+// @Success 	201 {object} model.User
+// @Router		/users [post]
 func (e *UserController) createHandler(c *gin.Context) {
 	var payload dto.UserRequestDto
 	if err := c.ShouldBindJSON(&payload); err != nil {
@@ -44,6 +62,14 @@ func (e *UserController) createHandler(c *gin.Context) {
 	common.SendCreateResponse(c, "SUCCESS", payloadResponse)
 }
 
+// LoginUser 	godoc
+// @Summary 	User login to get jwtAuth
+// @Description	Return the access token and id user
+// @Produce 	application/json
+// @Param		Login body dto.LoginRequestDto true "Login form"
+// @Tags 		User
+// @Success 	200 {object} dto.LoginResponseDto
+// @Router		/users/login [post]
 func (u *UserController) loginHandler(c *gin.Context) {
 	var payload dto.LoginRequestDto
 	if err := c.ShouldBindJSON(&payload); err != nil {
@@ -62,6 +88,15 @@ func (u *UserController) loginHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "success", loginData)
 }
 
+// GetBalance 	godoc
+// @Summary 	User Get their info balance
+// @Description	Return the info user and balance
+// @Produce 	application/json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Tags 		User
+// @Success 	200 {object} model.UserSaldo
+// @Router		/users/saldo [get]
 func (u *UserController) CheckBalance(c *gin.Context) {
 	claims, exists := c.Get("claims")
 	if !exists {
@@ -82,6 +117,16 @@ func (u *UserController) CheckBalance(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", response)
 }
 
+// UpdateUser 	godoc
+// @Summary 	User edit account
+// @Description	Return new the info user
+// @Produce 	application/json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Param		Edit body dto.UserRequestEditDto true "Edit form"
+// @Tags 		User
+// @Success 	200 {object} model.User
+// @Router		/users [PUT]
 func (s *UserController) UpdateHandler(c *gin.Context) {
 	claims, exists := c.Get("claims")
 	if !exists {
@@ -103,6 +148,18 @@ func (s *UserController) UpdateHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "UPDATE SUCCESS", updatedUser)
 }
 
+// VerifyUser 	godoc
+// @Summary 	User verify account
+// @Description	Return info user data
+// @Accept 		multipart/form-data
+// @Produce 	json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Param 		user formData string true "JSON data of user"
+// @Param 		photo formData file true "Photo"
+// @Tags 		User
+// @Success 	201 {object} dto.VerifyUser
+// @Router		/users/verify [POST]
 func (u *UserController) VerifyHandler(c *gin.Context) {
 	var payload dto.VerifyUser
 	claims, exists := c.Get("claims")
@@ -126,6 +183,17 @@ func (u *UserController) VerifyHandler(c *gin.Context) {
 	common.SendCreateResponse(c, "success", response)
 }
 
+// UpdatePinHandler godoc
+// @Tags User
+// @Summary Update user PIN
+// @Description Update user PIN with JSON payload
+// @Accept json
+// @Produce json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Param payload body dto.UpdatePinRequestSwag true "Update PIN Request Payload"
+// @Success 200 {object} dto.UpdatePinResponse
+// @Router /users/pin [put]
 func (p *UserController) UpdatePinHandler(c *gin.Context) {
 	var payload dto.UpdatePinRequest
 	if err := c.ShouldBindJSON(&payload); err != nil {
@@ -157,6 +225,17 @@ func (p *UserController) UpdatePinHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "success", response)
 }
 
+// CreateRekening godoc
+// @Tags User
+// @Summary Create Rekening User
+// @Description Create Rekening user to withdraw
+// @Accept json
+// @Produce json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Param rekening body dto.RekeningDtoSwag true "Rekening data"
+// @Success 201 {object} model.Rekening
+// @Router /users/rekening [post]
 func (p *UserController) CreateRekeningHandler(c *gin.Context) {
 	var payload model.Rekening
 	err := c.ShouldBind(&payload)
@@ -179,6 +258,16 @@ func (p *UserController) CreateRekeningHandler(c *gin.Context) {
 	common.SendCreateResponse(c, "SUCCESS", res)
 }
 
+// GetRekening godoc
+// @Tags User
+// @Summary Get Rekening User
+// @Description Get Rekening user
+// @Accept json
+// @Produce json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Success 200 {object} model.Rekening
+// @Router /users/rekening [get]
 func (p *UserController) GetRekeningHandler(c *gin.Context) {
 	claims, exists := c.Get("claims")
 	if !exists {

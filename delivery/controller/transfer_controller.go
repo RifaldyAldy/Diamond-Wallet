@@ -17,8 +17,17 @@ type TransferController struct {
 	rg *gin.RouterGroup
 }
 
-// tulis handler code kalian disini
-
+// CreateTransfer godoc
+// @Tags Transfer
+// @Summary Create request Transfer
+// @Description User may transfer to other user
+// @Accept json
+// @Produce json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Param Data body dto.TransferRequestSwag true "Payload data"
+// @Success 201 {object} model.Transfer
+// @Router /transfer [post]
 func (t *TransferController) TransferHandler(c *gin.Context) {
 	payload := dto.TransferRequest{}
 	c.ShouldBind(&payload)
@@ -72,6 +81,16 @@ func (t *TransferController) TransferHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", response)
 }
 
+// GetSendTransfer godoc
+// @Tags Transfer
+// @Summary User can get their histories send transfer @3datas/page
+// @Description User can get their histories send transfer @3datas/page
+// @Accept json
+// @Produce json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Success 200 {object} []model.Transfer
+// @Router /transfer/history/send [get]
 func (t *TransferController) GetSendTransferHandler(c *gin.Context) {
 	var id string
 	var page int
@@ -95,6 +114,16 @@ func (t *TransferController) GetSendTransferHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", datas)
 }
 
+// GetReceiveTransfer godoc
+// @Tags Transfer
+// @Summary User can get their histories receive transfer @3datas/page
+// @Description User can get their histories receive transfer @3datas/page
+// @Accept json
+// @Produce json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Success 200 {object} []model.Transfer
+// @Router /transfer/history/receive [get]
 func (t *TransferController) GetReceiveTransferHandler(c *gin.Context) {
 	var id string
 	var page int
@@ -118,6 +147,17 @@ func (t *TransferController) GetReceiveTransferHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", datas)
 }
 
+// GetSendTransferAdmin godoc
+// @Tags Admin
+// @Summary Admin can get their histories send transfer @3datas/page
+// @Description Admin can get their histories send transfer @3datas/page
+// @Accept json
+// @Produce json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Param		id path string true "User ID"
+// @Success 200 {object} []model.Transfer
+// @Router /transfer/history/admin/send/{id} [get]
 func (t *TransferController) AdminGetSendTransferHandler(c *gin.Context) {
 	var id string
 	var page int
@@ -137,6 +177,17 @@ func (t *TransferController) AdminGetSendTransferHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", datas)
 }
 
+// GetReceiveTransferAdmin godoc
+// @Tags Admin
+// @Summary Admin can get user histories receive transfer @3datas/page
+// @Description Admin can get user histories receive transfer @3datas/page
+// @Accept json
+// @Produce json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Param		id path string true "User ID"
+// @Success 200 {object} []model.Transfer
+// @Router /transfer/history/admin/receive/{id} [get]
 func (t *TransferController) AdminGetReceiveTransferHandler(c *gin.Context) {
 	var id string
 	var page int
@@ -155,6 +206,17 @@ func (t *TransferController) AdminGetReceiveTransferHandler(c *gin.Context) {
 	common.SendSingleResponse(c, "SUCCESS", datas)
 }
 
+// CreateRequestWithdraw godoc
+// @Tags Transfer
+// @Summary User can withdraw their balance to rekening bank
+// @Description User can withdraw their balance to rekening bank
+// @Accept json
+// @Produce json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Param		data body dto.WithdrawDto true "Withdraw ammount"
+// @Success 201 {object} model.Withdraw
+// @Router /transfer/withdraw [post]
 func (t *TransferController) WithdrawHander(c *gin.Context) {
 	payload := model.Withdraw{}
 	c.ShouldBind(&payload)
@@ -189,6 +251,16 @@ func (t *TransferController) WithdrawHander(c *gin.Context) {
 	common.SendCreateResponse(c, "SUCCESS", response)
 }
 
+// GetHistorytWithdraw godoc
+// @Tags Transfer
+// @Summary User can get histories withdraw
+// @Description User can get histories withdraw
+// @Accept json
+// @Produce json
+// @Security 	ApiKeyAuth
+// @Param 		Authorization header string true "Bearer"
+// @Success 200 {object} []model.Withdraw
+// @Router /transfer/withdraw [get]
 func (t *TransferController) GetWithdrawsHandler(c *gin.Context) {
 	var page int
 	page, _ = strconv.Atoi(c.Query("page"))

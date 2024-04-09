@@ -1,0 +1,833 @@
+basePath: /api/v1
+definitions:
+  common.ResponseMidtrans:
+    properties:
+      redirect_url:
+        type: string
+      token:
+        type: string
+    type: object
+  dto.AdminRequestDto:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  dto.LoginRequestDto:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  dto.LoginResponseDto:
+    properties:
+      accessToken:
+        type: string
+      userId:
+        type: string
+    type: object
+  dto.RekeningDtoSwag:
+    properties:
+      rekening:
+        type: string
+    type: object
+  dto.TopupRequest:
+    properties:
+      ammount:
+        type: integer
+    type: object
+  dto.TransferRequestSwag:
+    properties:
+      jumlah_transfer:
+        type: integer
+      pin:
+        type: string
+      tujuan_transfer:
+        type: string
+    type: object
+  dto.UpdatePinRequestSwag:
+    properties:
+      new_pin:
+        type: string
+      old_pin:
+        type: string
+    required:
+    - new_pin
+    - old_pin
+    type: object
+  dto.UpdatePinResponse:
+    properties:
+      pin:
+        type: string
+      user_id:
+        type: string
+    type: object
+  dto.UserRequestDto:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    type: object
+  dto.UserRequestEditDto:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+    type: object
+  dto.VerifyUser:
+    properties:
+      jenis_kelamin:
+        type: string
+      nik:
+        type: string
+      photo:
+        type: string
+      pin:
+        type: string
+      tanggal_lahir:
+        type: string
+      umur:
+        type: integer
+      user_id:
+        type: string
+    type: object
+  dto.WithdrawDto:
+    properties:
+      withdraw:
+        type: integer
+    type: object
+  model.Admin:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+  model.Rekening:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      rekening:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    type: object
+  model.TableTopupPayment:
+    properties:
+      ammount:
+        type: integer
+      created_at:
+        type: string
+      deskripsi:
+        type: string
+      id:
+        type: string
+      status:
+        type: string
+      token_midtrans:
+        type: string
+      updated_at:
+        type: string
+      url_payment:
+        type: string
+      user_id:
+        type: string
+    type: object
+  model.Transfer:
+    properties:
+      id:
+        type: string
+      jenis_transfer:
+        type: string
+      jumlah_transfer:
+        type: integer
+      nama_penerima:
+        type: string
+      nama_pengirim:
+        type: string
+      trx_id:
+        type: string
+      tujuan_transfer:
+        type: string
+      user_id:
+        type: string
+    type: object
+  model.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+      role:
+        type: string
+      saldo:
+        type: integer
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+  model.UserResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phone_number:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  model.UserSaldo:
+    properties:
+      pin:
+        type: string
+      saldo:
+        type: integer
+      user:
+        $ref: '#/definitions/model.UserResponse'
+    type: object
+  model.Withdraw:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      user_id:
+        type: string
+      withdraw:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: A tag service API in Go using Gin framework
+  title: Tag Service API
+  version: "1.0"
+paths:
+  /admin:
+    post:
+      consumes:
+      - application/json
+      description: Admin can create account
+      parameters:
+      - description: payload register
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AdminRequestDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Admin'
+      summary: Admin can create account
+      tags:
+      - Admin
+  /admin/login:
+    post:
+      consumes:
+      - application/json
+      description: Admin can login
+      parameters:
+      - description: payload login
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequestDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.LoginResponseDto'
+      summary: Admin can login
+      tags:
+      - Admin
+  /admin/user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Admin can get info and balance user
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.User'
+      security:
+      - ApiKeyAuth: []
+      summary: Admin can get info and balance user
+      tags:
+      - Admin
+  /topup:
+    post:
+      consumes:
+      - application/json
+      description: User can topup with payment gateway
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Ammount topup
+        in: body
+        name: ammount
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TopupRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.ResponseMidtrans'
+      security:
+      - ApiKeyAuth: []
+      summary: User can topup with payment gateway
+      tags:
+      - Topup
+  /topup/history:
+    get:
+      consumes:
+      - application/json
+      description: User can get histories topup with payment gateway
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.TableTopupPayment'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: User can get histories topup with payment gateway
+      tags:
+      - Topup
+  /topup/history/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Admin can get user histories topup with payment gateway
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.TableTopupPayment'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Admin can get user histories topup with payment gateway
+      tags:
+      - Admin
+  /transfer:
+    post:
+      consumes:
+      - application/json
+      description: User may transfer to other user
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Payload data
+        in: body
+        name: Data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TransferRequestSwag'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Transfer'
+      security:
+      - ApiKeyAuth: []
+      summary: Create request Transfer
+      tags:
+      - Transfer
+  /transfer/history/admin/receive/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Admin can get user histories receive transfer @3datas/page
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Transfer'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Admin can get user histories receive transfer @3datas/page
+      tags:
+      - Admin
+  /transfer/history/admin/send/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Admin can get their histories send transfer @3datas/page
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Transfer'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: Admin can get their histories send transfer @3datas/page
+      tags:
+      - Admin
+  /transfer/history/receive:
+    get:
+      consumes:
+      - application/json
+      description: User can get their histories receive transfer @3datas/page
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Transfer'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: User can get their histories receive transfer @3datas/page
+      tags:
+      - Transfer
+  /transfer/history/send:
+    get:
+      consumes:
+      - application/json
+      description: User can get their histories send transfer @3datas/page
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Transfer'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: User can get their histories send transfer @3datas/page
+      tags:
+      - Transfer
+  /transfer/withdraw:
+    get:
+      consumes:
+      - application/json
+      description: User can get histories withdraw
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Withdraw'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: User can get histories withdraw
+      tags:
+      - Transfer
+    post:
+      consumes:
+      - application/json
+      description: User can withdraw their balance to rekening bank
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Withdraw ammount
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.WithdrawDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Withdraw'
+      security:
+      - ApiKeyAuth: []
+      summary: User can withdraw their balance to rekening bank
+      tags:
+      - Transfer
+  /users:
+    post:
+      description: Return the info user
+      parameters:
+      - description: Create user
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserRequestDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.User'
+      summary: User register account.
+      tags:
+      - User
+    put:
+      description: Return new the info user
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Edit form
+        in: body
+        name: Edit
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserRequestEditDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+      security:
+      - ApiKeyAuth: []
+      summary: User edit account
+      tags:
+      - User
+  /users/{id}:
+    get:
+      description: Return the balance user with jwt id
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserSaldo'
+      security:
+      - ApiKeyAuth: []
+      summary: admin Get balance user with id param.
+      tags:
+      - Admin
+  /users/login:
+    post:
+      description: Return the access token and id user
+      parameters:
+      - description: Login form
+        in: body
+        name: Login
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequestDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LoginResponseDto'
+      summary: User login to get jwtAuth
+      tags:
+      - User
+  /users/pin:
+    put:
+      consumes:
+      - application/json
+      description: Update user PIN with JSON payload
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Update PIN Request Payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdatePinRequestSwag'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UpdatePinResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update user PIN
+      tags:
+      - User
+  /users/rekening:
+    get:
+      consumes:
+      - application/json
+      description: Get Rekening user
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Rekening'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Rekening User
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: Create Rekening user to withdraw
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Rekening data
+        in: body
+        name: rekening
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RekeningDtoSwag'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Rekening'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Rekening User
+      tags:
+      - User
+  /users/saldo:
+    get:
+      description: Return the info user and balance
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UserSaldo'
+      security:
+      - ApiKeyAuth: []
+      summary: User Get their info balance
+      tags:
+      - User
+  /users/verify:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Return info user data
+      parameters:
+      - description: Bearer
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: JSON data of user
+        in: formData
+        name: user
+        required: true
+        type: string
+      - description: Photo
+        in: formData
+        name: photo
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.VerifyUser'
+      security:
+      - ApiKeyAuth: []
+      summary: User verify account
+      tags:
+      - User
+swagger: "2.0"

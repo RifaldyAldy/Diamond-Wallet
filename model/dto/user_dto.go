@@ -10,6 +10,12 @@ type UserRequestDto struct {
 	PhoneNumber string `json:"phone_number"`
 }
 
+type UserRequestEditDto struct {
+	Name        string `json:"name"`
+	Email       string `json:"email"`
+	PhoneNumber string `json:"phone_number"`
+}
+
 type LoginRequestDto struct {
 	Username string `json:"username" binding:"required"`
 	Pass     string `json:"password" binding:"required"`
@@ -29,4 +35,12 @@ type UpdatePinRequest struct {
 	UserId string `json:"user_id"`
 	OldPin string `json:"old_pin" binding:"required"`
 	NewPin string `json:"new_pin" binding:"required"`
+}
+type UpdatePinRequestSwag struct {
+	OldPin string `json:"old_pin" binding:"required"`
+	NewPin string `json:"new_pin" binding:"required"`
+}
+
+type RekeningDtoSwag struct {
+	Rekening string `json:"rekening"`
 }

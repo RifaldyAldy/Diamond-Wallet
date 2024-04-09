@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -46,6 +47,7 @@ func GenerateTokenJwt(id, name, role string, expiredAt int64) (string, error) {
 func JWTAuth(roles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
+		fmt.Println(authHeader)
 		if !strings.Contains(authHeader, "Bearer") {
 			SendErrorResponse(c, http.StatusForbidden, "Invalid Token")
 			c.Abort()
