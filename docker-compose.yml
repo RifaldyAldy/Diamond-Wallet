@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  backend:
+    build:
+      dockerfile: Dockerfile
+    container_name: diamond-wallet-go
+    depends_on:
+      - db
+    environment:
+      - API_PORT=8888
+      - DB_HOST=172.209.0.2
+      - DB_PORT=5432
+      - DB_NAME=diamond_wallet_db
+      - DB_USER=ada
+      - PASSWORD=lovelace
+      - DB_DRIVER=postgres
+      - TOKEN_LIFE_TIME=10
+      - TOKEN_ISSUE_NAME=secrets
+      - CLIENT_ID=ada
+      - CLIENT_SECRET=lovelace
+      - APP_NAME=diamond-wallet
+      - TOKEN_KEY=lovelace
+    ports:
+      - "8888:8888"
+    networks:
+      - product-network
+  db:
+    image: postgres:alpine3.17
+    container_name: diamond-wallet-postgres
+    environment:
+      - POSTGRES_USER=ada
+      - POSTGRES_PASSWORD=lovelace
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - product-network
+volumes:
+  db-data:
+networks:
+  product-network:
+
