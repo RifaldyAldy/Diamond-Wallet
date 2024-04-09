@@ -12,7 +12,7 @@ import (
 
 type UserRepository interface {
 	Get(id string) (model.User, error)
-	Create(payload model.User) (model.User, error)
+	Create(payload dto.UserRequestDto) (model.User, error)
 	GetBalance(user_id string) (model.UserSaldo, error)
 	GetByUsername(username string) (model.User, error)
 	Update(id string, payload model.User) (model.User, error)
@@ -52,7 +52,7 @@ func (u *userRepository) Get(id string) (model.User, error) {
 	return user, nil
 }
 
-func (u *userRepository) Create(payload model.User) (model.User, error) {
+func (u *userRepository) Create(payload dto.UserRequestDto) (model.User, error) {
 	var user model.User
 	err := u.db.QueryRow(`
   INSERT INTO mst_user
@@ -308,7 +308,6 @@ func (u *userRepository) GetRekening(id string) (model.Rekening, error) {
 		&response.Created_at,
 		&response.Updated_at,
 	)
-
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return model.Rekening{}, fmt.Errorf("1")

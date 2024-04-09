@@ -44,7 +44,7 @@ func (u *userUseCase) CreateUser(payload dto.UserRequestDto) (model.User, error)
 	if err != nil {
 		return model.User{}, err
 	}
-	newUser := model.User{
+	newUser := dto.UserRequestDto{
 		Id:          payload.Id,
 		Name:        payload.Name,
 		Username:    payload.Username,
@@ -72,7 +72,6 @@ func (u *userUseCase) LoginUser(in dto.LoginRequestDto) (dto.LoginResponseDto, e
 
 	loginExpDuration, _ := strconv.Atoi(os.Getenv("TOKEN_LIFE_TIME"))
 	expiredAt := time.Now().Add(time.Duration(loginExpDuration) * time.Minute).Unix()
-	// TODO: tempel generate token jwt
 	accessToken, err := common.GenerateTokenJwt(userData.Id, userData.Name, userData.Role, expiredAt)
 	if err != nil {
 		return dto.LoginResponseDto{}, err
